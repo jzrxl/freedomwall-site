@@ -58,7 +58,8 @@ export async function onRequestPost({ request, env }) {
 
   const n = maxN + 1;
   const ext = hasImage ? "png" : "md";
-  const path = `${folder}/(${n}) ${time}.${ext}`;
+  const padded = String(n).padStart(2, "0");
+  const path = `${folder}/(${padded}) ${time}.${ext}`;
 
   const content = hasImage
     ? imageBase64
