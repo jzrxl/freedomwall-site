@@ -3,21 +3,21 @@
 
 <footer class="site-footer">
   <div class="fb-wrap">
-    <span class="fb-hint">check your submissions here</span>
+    <span class="fb-hint">check your<br>submissions here</span>
 
-    <svg class="fb-arrow" viewBox="0 0 130 75" fill="none" aria-hidden="true">
+    <svg class="fb-arrow" viewBox="0 0 200 100" fill="none" aria-hidden="true">
       <path
-        d="M 112 8 C 118 42, 70 55, 28 65"
+        d="M 178 28 Q 110 0, 30 78"
         stroke="currentColor"
-        stroke-width="1.7"
+        stroke-width="1.8"
         stroke-linecap="round"
         stroke-dasharray="4 5"
         opacity="0.7"
       />
       <path
-        d="M 46 57 L 26 65 L 42 74"
+        d="M 52 68 L 26 80 L 44 92"
         stroke="currentColor"
-        stroke-width="1.7"
+        stroke-width="1.8"
         stroke-linecap="round"
         stroke-linejoin="round"
         fill="none"
@@ -52,43 +52,49 @@
   }
 
   .fb-wrap {
-    display: grid;
-    grid-template-columns: auto;
-    justify-items: end;
-    row-gap: 0;
-    width: max-content;
-    max-width: 100%;
-    padding: 4px 8px;
+    position: relative;
+    width: 240px;
+    height: 160px;
     margin: 0 auto;
   }
 
   .fb-hint {
-    font-size: 0.78rem;
-    font-weight: 600;
+    position: absolute;
+    top: 0;
+    right: 6px;
+    transform: rotate(-7deg);
+    transform-origin: top right;
+    text-align: right;
+    line-height: 1.2;
+    font-family: 'Fraunces', Georgia, serif;
+    font-style: italic;
+    font-size: 0.92rem;
+    font-weight: 500;
     color: var(--muted);
-    opacity: 0.85;
-    letter-spacing: 0.02em;
+    opacity: 0.9;
+    letter-spacing: 0.01em;
     white-space: nowrap;
-    margin-right: 4px;
   }
 
   .fb-arrow {
-    width: 130px;
-    height: 75px;
+    position: absolute;
+    top: 34px;
+    left: 10px;
+    width: 200px;
+    height: 100px;
     color: var(--muted);
-    margin-right: 24px;
-    margin-top: -4px;
-    margin-bottom: -10px;
+    pointer-events: none;
   }
 
   .fb-icon-btn {
-    justify-self: start;
-    margin-left: 14px;
+    position: absolute;
+    bottom: 0;
+    left: 12px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
+    width: 42px;
+    height: 42px;
     border-radius: 50%;
     border: 1px solid var(--border);
     background: var(--card);
@@ -98,8 +104,8 @@
   }
 
   .fb-icon-btn svg {
-    width: 18px;
-    height: 18px;
+    width: 19px;
+    height: 19px;
     display: block;
   }
 
@@ -135,7 +141,9 @@
   }
 
   @media (max-width: 360px) {
-    .fb-arrow { width: 100px; height: 60px; margin-right: 16px; }
-    .fb-hint { font-size: 0.72rem; }
+    .fb-wrap { width: 200px; height: 140px; }
+    .fb-arrow { width: 170px; height: 85px; top: 30px; }
+    .fb-hint { font-size: 0.82rem; }
+    .fb-icon-btn { width: 38px; height: 38px; }
   }
 </style>
