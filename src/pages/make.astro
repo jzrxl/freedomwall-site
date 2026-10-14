@@ -1,0 +1,269 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="Card Generator · SSU Freedom Wall">
+  <div class="make-page">
+    <a href="/" class="back-link">← Back</a>
+    <h1>Card Generator</h1>
+    <p class="sub">Paste a message, download the image, post it.</p>
+
+    <div class="card">
+      <label for="msg">Message</label>
+      <textarea
+        id="msg"
+        maxlength="5000"
+        placeholder="Paste the submission here..."
+      ></textarea>
+
+      <div class="preview-wrap">
+        <canvas id="canvas" width="1080" height="1350"></canvas>
+      </div>
+
+      <div class="actions">
+        <button type="button" id="download" class="btn-primary">Download PNG</button>
+        <button type="button" id="copy" class="btn-secondary">Copy caption</button>
+      </div>
+      <div id="status" class="status"></div>
+    </div>
+  </div>
+</Base>
+
+<style>
+  .make-page { width: 100%; }
+
+  .back-link {
+    display: inline-block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-decoration: none;
+    margin-bottom: 14px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    transition: background 0.15s, color 0.15s;
+  }
+  .back-link:hover { background: var(--hover-bg); color: var(--accent); }
+
+  h1 {
+    font-size: 2rem;
+    margin: 0 0 6px;
+    text-align: center;
+  }
+
+  .sub {
+    color: var(--muted);
+    font-size: 0.92rem;
+    text-align: center;
+    margin: 0 0 22px;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: var(--shadow);
+  }
+
+  label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+
+  textarea {
+    width: 100%;
+    min-height: 120px;
+    resize: vertical;
+    padding: 14px;
+    font-size: 1rem;
+    line-height: 1.5;
+    font-family: inherit;
+    font-weight: 500;
+    color: var(--text);
+    background: var(--input-bg);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  textarea:focus { border-color: var(--accent); }
+
+  .preview-wrap {
+    margin-top: 16px;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background: #f0f0f0;
+    display: flex;
+    justify-content: center;
+  }
+
+  canvas {
+    display: block;
+    width: 100%;
+    max-width: 360px;
+    height: auto;
+  }
+
+  .actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+  }
+
+  .actions button {
+    flex: 1;
+    padding: 14px;
+    font-size: 0.98rem;
+    font-weight: 700;
+    font-family: inherit;
+    border-radius: 14px;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.15s, background 0.15s;
+  }
+
+  .btn-primary {
+    background: var(--grad);
+    color: #fff;
+    box-shadow: 0 6px 16px rgba(0, 84, 166, 0.25);
+  }
+  .btn-primary:hover { opacity: 0.94; }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--muted);
+    border: 1.5px solid var(--border) !important;
+  }
+  .btn-secondary:hover { background: var(--hover-bg); color: var(--accent); }
+
+  .status {
+    margin-top: 12px;
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--muted);
+    min-height: 1em;
+  }
+</style>
+
+<script>
+  const canvas = document.getElementById('canvas') as HTMLCanvasElement;
+  const ctx = canvas.getContext('2d')!;
+  const msgInput = document.getElementById('msg') as HTMLTextAreaElement;
+  const downloadBtn = document.getElementById('download') as HTMLButtonElement;
+  const copyBtn = document.getElementById('copy') as HTMLButtonElement;
+  const status = document.getElementById('status')!;
+
+  const W = 1080;
+  const H = 1350;
+  const PAD_X = 90;
+  const PAD_TOP = 120;
+  const FOOTER_Y = H - 110;
+
+  function wrapText(text: string, maxWidth: number): string[] {
+    const lines: string[] = [];
+    for (const paragraph of text.split('\n')) {
+      if (paragraph.trim() === '') { lines.push(''); continue; }
+      const words = paragraph.split(/\s+/);
+      let line = '';
+      for (const word of words) {
+        const test = line ? line + ' ' + word : word;
+        if (ctx.measureText(test).width > maxWidth && line) {
+          lines.push(line);
+          line = word;
+        } else {
+          line = test;
+        }
+      }
+      if (line) lines.push(line);
+    }
+    return lines;
+  }
+
+  function draw() {
+    const msg = msgInput.value.trim() || 'Your message will appear here.';
+
+    const grad = ctx.createLinearGradient(0, 0, W, H);
+    grad.addColorStop(0, '#EAF3FB');
+    grad.addColorStop(1, '#FFF6DE');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+    ctx.font = '600 22px Quicksand';
+    ctx.fillStyle = '#6B8099';
+    ctx.fillText('ssu freedom wall', PAD_X, 60);
+
+    ctx.font = '500 46px Quicksand';
+    ctx.fillStyle = '#142B44';
+    const lines = wrapText(msg, W - PAD_X * 2);
+    const lineHeight = 68;
+    lines.forEach((line, i) => {
+      ctx.fillText(line, PAD_X, PAD_TOP + i * lineHeight);
+    });
+
+    ctx.strokeStyle = 'rgba(20, 43, 68, 0.12)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(PAD_X, FOOTER_Y - 30);
+    ctx.lineTo(W - PAD_X, FOOTER_Y - 30);
+    ctx.stroke();
+
+    ctx.font = '600 20px Quicksand';
+    ctx.fillStyle = '#6B8099';
+    ctx.fillText('ssu · freedom wall', PAD_X, FOOTER_Y);
+
+    ctx.textAlign = 'right';
+    ctx.fillStyle = '#9BB0C9';
+    ctx.font = '500 18px Quicksand';
+    ctx.fillText('freedomwallssu.pages.dev', W - PAD_X, FOOTER_Y + 2);
+  }
+
+  async function ready() {
+    try {
+      await Promise.all([
+        document.fonts.load('600 22px Quicksand'),
+        document.fonts.load('500 46px Quicksand'),
+        document.fonts.load('600 20px Quicksand'),
+        document.fonts.load('500 18px Quicksand'),
+      ]);
+    } catch (e) {}
+    draw();
+  }
+
+  msgInput?.addEventListener('input', draw);
+
+  downloadBtn?.addEventListener('click', () => {
+    canvas.toBlob((blob) => {
+      if (!blob) return;
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `ssu-wall-${Date.now()}.png`;
+      a.click();
+      URL.revokeObjectURL(url);
+      status.textContent = 'Downloaded.';
+      setTimeout(() => status.textContent = '', 2000);
+    }, 'image/png');
+  });
+
+  copyBtn?.addEventListener('click', async () => {
+    const msg = msgInput.value.trim();
+    if (!msg) { status.textContent = 'Nothing to copy.'; return; }
+    const caption = `#SSUFreedomWall\n\n${msg}`;
+    try {
+      await navigator.clipboard.writeText(caption);
+      status.textContent = 'Caption copied.';
+    } catch {
+      status.textContent = 'Copy failed — select manually.';
+    }
+    setTimeout(() => status.textContent = '', 2500);
+  });
+
+  ready();
+</script>
