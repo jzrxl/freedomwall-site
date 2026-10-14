@@ -64,12 +64,33 @@ const ogImage = `${siteUrl}/logo.png`;
   <meta name="twitter:description" content={description} />
   <meta name="twitter:image" content={ogImage} />
 
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <title>{title}</title>
   <!-- Facet Analytics -->
   <script defer src="https://facet.jzrl478.workers.dev/script.js" data-site-id="336cdcbe-686f-4a2a-80a2-6f42ed98e8bb" data-host="https://facet.jzrl478.workers.dev"></script>
+  <link rel="preload" href="/fonts/Caprasimo.ttf" as="font" type="font/ttf" crossorigin />
+  <link rel="preload" href="/fonts/Fraunces.ttf" as="font" type="font/ttf" crossorigin />
+  <link rel="preload" href="/fonts/Quicksand.ttf" as="font" type="font/ttf" crossorigin />
+
+  <style is:inline>
+    @font-face {
+      font-family: 'Caprasimo';
+      src: url('/fonts/Caprasimo.ttf') format('truetype');
+      font-weight: 400;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'Fraunces';
+      src: url('/fonts/Fraunces.ttf') format('truetype');
+      font-weight: 100 900;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'Quicksand';
+      src: url('/fonts/Quicksand.ttf') format('truetype');
+      font-weight: 300 700;
+      font-display: swap;
+    }
+  </style>
 </head>
 <body>
   <button id="themeToggle" class="theme-toggle" type="button" aria-label="Toggle theme" title="Toggle theme">
