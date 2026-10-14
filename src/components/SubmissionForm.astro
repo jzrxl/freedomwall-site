@@ -274,8 +274,9 @@ import Icon from './Icon.astro';
 
     // Light gradient background
     const grad = ctx.createLinearGradient(0, 0, W, H);
-    grad.addColorStop(0, '#EAF3FB');
-    grad.addColorStop(1, '#FFF6DE');
+    grad.addColorStop(0, '#EEF5FB');
+    grad.addColorStop(0.5, '#F7F2E5');
+grad.addColorStop(1, '#FDF4DE');
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, W, H);
 
