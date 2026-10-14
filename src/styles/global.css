@@ -76,6 +76,8 @@ h1 {
   opacity: 0;
   transition: transform 0.3s, opacity 0.3s;
   z-index: 20;
+  text-align: center;
+  max-width: calc(100vw - 40px);
 }
 
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }

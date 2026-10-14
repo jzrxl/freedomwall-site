@@ -4,23 +4,15 @@ import Icon from './Icon.astro';
 
 <form id="form">
   <div class="card">
-    <div class="row">
-      <label for="audience">To <span class="hint">(College or Program)</span></label>
-      <input type="text" id="audience" maxlength="80" placeholder="e.g. CCS, BSIT, College of Engineering" required />
-    </div>
-
-    <div class="row">
-      <label for="message">Message</label>
-      <textarea id="message" maxlength="500" placeholder="Share your thoughts, your name won't be shown." required></textarea>
-      <div class="meta">
-        <span>Nothing is stored except your words.</span>
-        <span id="counter">0 / 500</span>
-      </div>
-    </div>
-
-    <div class="row">
-      <label for="sender">From <span class="hint">(desired name or moniker)</span></label>
-      <input type="text" id="sender" maxlength="40" placeholder="Anonymous" />
+    <textarea
+      id="message"
+      maxlength="500"
+      placeholder="Share your thoughts, your name won't be shown."
+      required
+    ></textarea>
+    <div class="meta">
+      <span>Nothing is stored except your words.</span>
+      <span id="counter">0 / 500</span>
     </div>
 
     <button class="btn" type="submit">
@@ -31,32 +23,12 @@ import Icon from './Icon.astro';
 </form>
 
 <style>
-  .row { margin-bottom: 18px; }
-  label { display: block; font-size: 0.9rem; font-weight: 700; margin-bottom: 8px; }
-  .hint { font-weight: 500; color: var(--muted); font-size: 0.82rem; }
-
-  input[type="text"] {
-    width: 100%;
-    padding: 14px 16px;
-    font-size: 1rem;
-    font-family: inherit;
-    font-weight: 500;
-    color: var(--text);
-    background: #fffafc;
-    border: 1.5px solid var(--border);
-    border-radius: 14px;
-    outline: none;
-    transition: border-color 0.15s, background 0.15s;
-  }
-  input[type="text"]:focus { border-color: var(--accent); background: #fff; }
-  input[type="text"]::placeholder { color: #c9b3bd; }
-
   textarea {
     width: 100%;
-    min-height: 200px;
+    min-height: 240px;
     resize: vertical;
-    padding: 16px;
-    font-size: 1.02rem;
+    padding: 18px;
+    font-size: 1.05rem;
     line-height: 1.6;
     font-family: inherit;
     font-weight: 500;
@@ -66,6 +38,7 @@ import Icon from './Icon.astro';
     border-radius: 16px;
     outline: none;
     transition: border-color 0.15s, background 0.15s;
+    display: block;
   }
   textarea:focus { border-color: var(--accent); background: #fff; }
   textarea::placeholder { color: #c9b3bd; }
@@ -74,14 +47,14 @@ import Icon from './Icon.astro';
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 8px;
+    margin-top: 10px;
     font-size: 0.83rem;
     font-weight: 500;
     color: var(--muted);
   }
 
   .btn {
-    margin-top: 8px;
+    margin-top: 16px;
     width: 100%;
     padding: 16px;
     font-size: 1.05rem;
@@ -106,8 +79,6 @@ import Icon from './Icon.astro';
 <script>
   const form = document.getElementById('form') as HTMLFormElement;
   const message = document.getElementById('message') as HTMLTextAreaElement;
-  const audience = document.getElementById('audience') as HTMLInputElement;
-  const sender = document.getElementById('sender') as HTMLInputElement;
   const counter = document.getElementById('counter')!;
 
   message?.addEventListener('input', () => {
@@ -117,14 +88,11 @@ import Icon from './Icon.astro';
   form?.addEventListener('submit', (e) => {
     e.preventDefault();
 
-    const to = audience.value.trim() || 'Everyone';
     const msg = message.value.trim();
-    const from = sender.value.trim() || 'Anonymous';
+    if (!msg) return;
 
-    const finalText = `To: ${to}\nMessage: ${msg}\nFrom: ${from}`;
-
-    (window as any).__finalText = finalText;
-    (window as any).__previewData = { to, message: msg, from };
+    (window as any).__finalText = msg;
+    (window as any).__previewMessage = msg;
 
     window.dispatchEvent(new CustomEvent('preview-ready'));
     document.getElementById('overlay')?.classList.add('open');
