@@ -23,12 +23,18 @@ import Icon from '../components/Icon.astro';
     <section class="about-card">
       <p>
         I'm a freshman from BINDTECH ELXT-1A. I built this wall because there's
-        always stuff people can't say out loud — things you'd tell a friend at
-        3am but not to a face at 3pm.
+        always stuff people can't say out loud. That's it.
       </p>
-      <p>
-        So here we are. No name, no sign-up, no trace. Just say it.
-      </p>
+    </section>
+
+    <section class="about-card video-card">
+      <video
+        class="about-video"
+        src="/kalaindaw.mp4"
+        controls
+        playsinline
+        preload="metadata"
+      ></video>
     </section>
 
     <section class="about-card">
@@ -164,6 +170,23 @@ import Icon from '../components/Icon.astro';
     box-shadow: var(--shadow);
     margin-bottom: 14px;
     transition: background 0.3s, border-color 0.3s;
+  }
+
+  .video-card {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 14px;
+  }
+
+  .about-video {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    border-radius: calc(var(--radius) - 8px);
+    background: #000;
+    outline: none;
   }
 
   .section-header {
