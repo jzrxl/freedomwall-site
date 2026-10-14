@@ -1,24 +1,29 @@
 :root {
   color-scheme: only light;
-  --bg-from: #fff0f5;
-  --bg-to: #ede4ff;
-  --card: #ffffff;
-  --text: #3a2733;
-  --muted: #9b8292;
-  --border: #f5d8e8;
-  --accent: #ec4899;
-  --accent-2: #a855f7;
+  /* background gradient: soft blue tint -> soft gold tint */
+  --bg-from: #EAF3FB;
+  --bg-to: #FFF6DE;
+  --card: #FFFFFF;
+  --text: #142B44;
+  --muted: #6B8099;
+  --border: #D5E3F2;
+  /* SSU primary (blue) and accent (gold) */
+  --accent: #0054A6;
+  --accent-2: #FFC72C;
   --radius: 22px;
-  --shadow: 0 12px 40px rgba(236, 72, 153, 0.14);
+  --shadow: 0 12px 40px rgba(0, 84, 166, 0.15);
   --font-display: 'Caprasimo', Georgia, serif;
   --font-body: 'Quicksand', ui-rounded, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* shared SSU gradient: blue -> mid blue -> gold */
+  --grad: linear-gradient(135deg, #0054A6 0%, #4A9BDC 50%, #FFC72C 100%);
 }
 
 * { box-sizing: border-box; }
 
 html {
   color-scheme: only light;
-  background: #fff0f5;
+  background: #EAF3FB;
 }
 
 body {
@@ -45,7 +50,7 @@ h1 {
   text-align: center;
   line-height: 1.1;
   letter-spacing: -0.5px;
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  background: var(--grad);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -67,13 +72,11 @@ h1 {
   box-shadow: var(--shadow);
 }
 
-/* Every interactive element inherits light palette, no matter what */
 input, textarea, button, select {
   color-scheme: only light;
   font-family: inherit;
 }
 
-/* Resist Android / Chrome force-dark */
 body, .card, input, textarea, button, .modal, .preview, .toast {
   forced-color-adjust: none;
 }
@@ -100,24 +103,17 @@ body, .card, input, textarea, button, .modal, .preview, .toast {
 
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-/* Explicitly reassert light theme even if the OS says dark */
 @media (prefers-color-scheme: dark) {
   :root {
     color-scheme: only light;
-    --bg-from: #fff0f5;
-    --bg-to: #ede4ff;
-    --card: #ffffff;
-    --text: #3a2733;
-    --muted: #9b8292;
-    --border: #f5d8e8;
+    --bg-from: #EAF3FB;
+    --bg-to: #FFF6DE;
+    --card: #FFFFFF;
+    --text: #142B44;
+    --muted: #6B8099;
+    --border: #D5E3F2;
   }
-
-  html { background: #fff0f5; }
-
-  body {
-    background: linear-gradient(135deg, #fff0f5 0%, #ede4ff 100%);
-    color: #3a2733;
-  }
-
-  .card { background: #ffffff; border-color: #f5d8e8; }
+  html { background: #EAF3FB; }
+  body { background: linear-gradient(135deg, #EAF3FB 0%, #FFF6DE 100%); color: #142B44; }
+  .card { background: #FFFFFF; border-color: #D5E3F2; }
 }

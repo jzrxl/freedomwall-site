@@ -26,7 +26,6 @@ import Icon from './Icon.astro';
 </div>
 
 <style>
-  /* lock light theme inside the modal */
   .overlay, .modal, .preview {
     color-scheme: only light;
     forced-color-adjust: none;
@@ -35,7 +34,7 @@ import Icon from './Icon.astro';
   .overlay {
     position: fixed;
     inset: 0;
-    background: rgba(58, 39, 51, 0.45);
+    background: rgba(20, 43, 68, 0.45);
     backdrop-filter: blur(6px);
     display: none;
     align-items: center;
@@ -47,7 +46,7 @@ import Icon from './Icon.astro';
 
   .modal {
     background: #ffffff;
-    border: 1px solid #f5d8e8;
+    border: 1px solid #D5E3F2;
     border-radius: var(--radius);
     max-width: 520px;
     width: 100%;
@@ -63,32 +62,32 @@ import Icon from './Icon.astro';
     display: flex;
     align-items: center;
     gap: 0.45em;
-    color: var(--text);
+    color: #142B44;
   }
 
   :global(.h2-icon) {
     width: 0.85em;
     height: 0.85em;
-    color: var(--accent);
+    color: #0054A6;
     flex-shrink: 0;
   }
 
   .hint {
     margin: 0 0 16px;
-    color: var(--muted);
+    color: #6B8099;
     font-size: 0.9rem;
     font-weight: 500;
   }
 
   .preview {
-    background: #fffafc;
-    border: 1.5px solid #f5d8e8;
+    background: #F7FAFD;
+    border: 1.5px solid #D5E3F2;
     border-radius: 14px;
     padding: 18px 20px;
     font-size: 1rem;
     line-height: 1.6;
     font-weight: 500;
-    color: var(--text);
+    color: #142B44;
     white-space: pre-wrap;
     word-wrap: break-word;
     max-height: 300px;
@@ -117,26 +116,26 @@ import Icon from './Icon.astro';
 
   .cancel {
     background: transparent;
-    color: #9b8292;
-    border: 1.5px solid #f5d8e8;
+    color: #6B8099;
+    border: 1.5px solid #D5E3F2;
   }
-  .cancel:hover { background: #fff5f9; color: #3a2733; }
+  .cancel:hover { background: #EAF3FB; color: #142B44; }
 
   .confirm {
-    background: linear-gradient(135deg, #ec4899, #a855f7);
-    color: #fff;
-    box-shadow: 0 6px 18px rgba(236, 72, 153, 0.3);
+    background: var(--grad);
+    color: #ffffff;
+    box-shadow: 0 6px 18px rgba(0, 84, 166, 0.3);
   }
   .confirm:hover { opacity: 0.94; }
 
-  /* reassert palette if the OS or browser forces dark */
   @media (prefers-color-scheme: dark) {
-    .modal { background: #ffffff; border-color: #f5d8e8; }
-    .modal h2 { color: #3a2733; }
-    .hint { color: #9b8292; }
-    .preview { background: #fffafc; border-color: #f5d8e8; color: #3a2733; }
-    .cancel { color: #9b8292; border-color: #f5d8e8; }
-    .cancel:hover { background: #fff5f9; color: #3a2733; }
+    .modal { background: #ffffff; border-color: #D5E3F2; }
+    .modal h2 { color: #142B44; }
+    .hint { color: #6B8099; }
+    .preview { background: #F7FAFD; border-color: #D5E3F2; color: #142B44; }
+    .cancel { color: #6B8099; border-color: #D5E3F2; }
+    .cancel:hover { background: #EAF3FB; color: #142B44; }
+    .confirm { color: #ffffff; }
   }
 </style>
 
