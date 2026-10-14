@@ -16,13 +16,17 @@ import Icon from './Icon.astro';
       <span>Send as image instead of text</span>
     </label>
 
+    <div class="image-note" id="imageNote" hidden>
+      <span id="imageNoteText">Best up to 800 characters (0 / 800)</span>
+    </div>
+
     <div class="meta">
       <span id="counter">0 / 5000</span>
     </div>
 
     <button class="btn" type="submit">
       <Icon name="send" />
-      <span>Send</span>
+      <span id="btnLabel">Send</span>
     </button>
     <p class="shortcut-hint">Tip: press Ctrl + Enter to send</p>
   </div>
@@ -69,6 +73,19 @@ import Icon from './Icon.astro';
     flex-shrink: 0;
   }
   .image-option:hover { color: var(--text); }
+
+  .image-note {
+    margin: 2px 0 0 23px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--muted);
+    transition: color 0.15s;
+  }
+  .image-note.over {
+    color: #dc2626;
+    font-weight: 600;
+  }
+  [data-theme="dark"] .image-note.over { color: #f87171; }
 
   .meta {
     display: flex;
@@ -120,6 +137,7 @@ import Icon from './Icon.astro';
 <script>
   const DRAFT_KEY = 'fw_draft';
   const MAX = 5000;
+  const IMAGE_MAX = 800;
   const WARN_AT = 4500;
   const DANGER_AT = 4900;
 
@@ -128,12 +146,34 @@ import Icon from './Icon.astro';
   const counter = document.getElementById('counter')!;
   const meta = counter.parentElement!;
   const asImage = document.getElementById('asImage') as HTMLInputElement;
+  const imageNote = document.getElementById('imageNote')!;
+  const imageNoteText = document.getElementById('imageNoteText')!;
+  const btnLabel = document.getElementById('btnLabel')!;
 
   function updateCounter() {
     const len = message.value.length;
     counter.textContent = `${len} / ${MAX}`;
     meta.classList.toggle('count-warn', len >= WARN_AT && len < DANGER_AT);
     meta.classList.toggle('count-danger', len >= DANGER_AT);
+  }
+
+  function updateImageNote() {
+    const checked = asImage.checked;
+    const len = message.value.length;
+    imageNote.hidden = !checked;
+    if (!checked) {
+      imageNote.classList.remove('over');
+      return;
+    }
+    const over = len > IMAGE_MAX;
+    imageNote.classList.toggle('over', over);
+    if (over) {
+      imageNoteText.textContent = `Too long for image (${len} / ${IMAGE_MAX}) — will send as text instead`;
+      btnLabel.textContent = 'Send as text';
+    } else {
+      imageNoteText.textContent = `Best up to ${IMAGE_MAX} characters (${len} / ${IMAGE_MAX})`;
+      btnLabel.textContent = 'Send';
+    }
   }
 
   try {
@@ -144,11 +184,14 @@ import Icon from './Icon.astro';
   let saveTimer: number | undefined;
   message?.addEventListener('input', () => {
     updateCounter();
+    updateImageNote();
     clearTimeout(saveTimer);
     saveTimer = window.setTimeout(() => {
       try { localStorage.setItem(DRAFT_KEY, message.value); } catch (e) {}
     }, 400);
   });
+
+  asImage?.addEventListener('change', updateImageNote);
 
   message?.addEventListener('keydown', (e) => {
     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
@@ -160,35 +203,29 @@ import Icon from './Icon.astro';
   async function generateCard(messageText: string): Promise<string | null> {
     try {
       await Promise.all([
-        document.fonts.load('400 60px Fraunces'),
-        document.fonts.load('400 34px Fraunces'),
-        document.fonts.load('400 46px Caprasimo'),
+        document.fonts.load('400 58px Fraunces'),
+        document.fonts.load('400 28px Fraunces'),
       ]);
       await document.fonts.ready;
     } catch (e) {}
 
+    const logo = await new Promise<HTMLImageElement | null>((resolve) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = () => resolve(null);
+      img.src = '/logo-mark.png';
+    });
+
     const W = 1080;
     const PAD_X = 100;
     const TOP_PAD = 140;
-    const BOTTOM_BRAND_H = 160;
+    const FOOTER_H = 260;
     const MIN_H = 1080;
-    const MAX_H = 2400;
+    const MAX_H = 3000;
 
     const canvas = document.createElement('canvas');
     let ctx = canvas.getContext('2d');
     if (!ctx) return null;
-
-    let logoImg: HTMLImageElement | null = null;
-    try {
-      logoImg = await new Promise<HTMLImageElement>((resolve, reject) => {
-        const img = new Image();
-        img.onload = () => resolve(img);
-        img.onerror = reject;
-        img.src = '/logo-mark.png';
-      });
-    } catch (e) {}
-
-
 
     function wrapText(c: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
       const out: string[] = [];
@@ -215,9 +252,8 @@ import Icon from './Icon.astro';
     let lineHeight = 74;
     let lines: string[] = [];
     let textBlockH = 0;
-    let totalH = MIN_H;
 
-    for (let size = 58; size >= 30; size -= 2) {
+    for (let size = 58; size >= 28; size -= 2) {
       fontSize = size;
       lineHeight = Math.round(size * 1.28);
       const m = document.createElement('canvas');
@@ -225,54 +261,59 @@ import Icon from './Icon.astro';
       mctx.font = `400 ${fontSize}px Fraunces`;
       lines = wrapText(mctx, messageText, maxTextWidth);
       textBlockH = lines.length * lineHeight;
-      totalH = TOP_PAD + textBlockH + BOTTOM_BRAND_H;
-      if (totalH <= MAX_H) break;
+      const candidate = TOP_PAD + textBlockH + 60 + FOOTER_H;
+      if (candidate <= MAX_H) break;
     }
 
-    const H = Math.max(MIN_H, Math.min(MAX_H, totalH));
+    const contentH = textBlockH + 60;
+    const H = Math.max(MIN_H, TOP_PAD + contentH + FOOTER_H);
+
     canvas.width = W;
     canvas.height = H;
     ctx = canvas.getContext('2d')!;
 
-    // Background gradient
     const grad = ctx.createLinearGradient(0, 0, W, H);
     grad.addColorStop(0, '#EAF3FB');
     grad.addColorStop(1, '#FFF6DE');
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, W, H);
 
-    // Corner ornaments
     ctx.fillStyle = 'rgba(0, 84, 166, 0.08)';
     ctx.beginPath();
     ctx.arc(0, 0, 280, 0, Math.PI * 2);
     ctx.fill();
-
     ctx.fillStyle = 'rgba(255, 199, 44, 0.10)';
     ctx.beginPath();
     ctx.arc(W, H, 320, 0, Math.PI * 2);
     ctx.fill();
 
-    // Body message (centered, serif)
+    const contentTop = TOP_PAD;
+    const contentBottom = TOP_PAD + contentH;
+    const contentMidY = (contentTop + contentBottom) / 2;
+    const bodyStartY = contentMidY - textBlockH / 2 + lineHeight / 2;
+
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.font = `400 ${fontSize}px Fraunces`;
     ctx.fillStyle = '#142B44';
-
-    const contentArea = H - TOP_PAD - BOTTOM_BRAND_H;
-    const bodyStartY = TOP_PAD + contentArea / 2 - textBlockH / 2 + lineHeight / 2;
     lines.forEach((line, i) => {
       ctx.fillText(line, W / 2, bodyStartY + i * lineHeight);
     });
 
-    // Bottom brand (Caprasimo, SSU blue)
-    if (logoImg) {
-      const logoW = 380;
-      const logoH = Math.round((logoImg.height / logoImg.width) * logoW);
-      ctx.drawImage(logoImg, (W - logoW) / 2, H - 90 - logoH / 2, logoW, logoH);
+    const footerTop = H - FOOTER_H;
+    const footerCy = footerTop + FOOTER_H / 2;
+    if (logo) {
+      const logoMaxW = 380;
+      const logoMaxH = 100;
+      const ratio = logo.width / logo.height;
+      let lw = logoMaxW;
+      let lh = lw / ratio;
+      if (lh > logoMaxH) { lh = logoMaxH; lw = lh * ratio; }
+      ctx.drawImage(logo, (W - lw) / 2, footerCy - lh / 2, lw, lh);
     } else {
       ctx.font = '400 46px Caprasimo';
       ctx.fillStyle = '#0054A6';
-      ctx.fillText('SSU Freedom Wall', W / 2, H - 70);
+      ctx.fillText('SSU Freedom Wall', W / 2, footerCy);
     }
 
     const dataUrl = canvas.toDataURL('image/png');
@@ -285,7 +326,17 @@ import Icon from './Icon.astro';
     if (!msg) return;
 
     let imageBase64: string | null = null;
-    if (asImage?.checked) {
+    let imageModeActive = asImage?.checked ?? false;
+
+    // Soft-cap: if the message exceeds IMAGE_MAX, fall back to text
+    if (imageModeActive && msg.length > IMAGE_MAX) {
+      imageModeActive = false;
+      if (asImage) asImage.checked = false;
+      updateImageNote();
+      showToast('Message is too long for an image — sending as text instead.');
+    }
+
+    if (imageModeActive) {
       imageBase64 = await generateCard(msg);
       if (!imageBase64) {
         alert('Could not generate the card. Try again or uncheck the image option.');
@@ -298,4 +349,14 @@ import Icon from './Icon.astro';
     document.getElementById('overlay')?.classList.add('open');
     window.dispatchEvent(new CustomEvent('confirm-open'));
   });
+
+  function showToast(text: string) {
+    const toast = document.getElementById('toast');
+    if (!toast) return;
+    toast.textContent = text;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3500);
+  }
+
+  updateImageNote();
 </script>
