@@ -4,10 +4,7 @@ import Icon from './Icon.astro';
 
 <div class="overlay" id="overlay">
   <div class="modal">
-    <h2>
-      <Icon name="heart" class="h2-icon" />
-      Send this message?
-    </h2>
+    <h2>Send this message?</h2>
     <p class="hint">Here's how it'll appear on the wall.</p>
 
     <div class="preview" id="preview"></div>
@@ -59,13 +56,6 @@ import Icon from './Icon.astro';
     align-items: center;
     gap: 0.45em;
     color: var(--text);
-  }
-
-  :global(.h2-icon) {
-    width: 0.85em;
-    height: 0.85em;
-    color: var(--accent);
-    flex-shrink: 0;
   }
 
   .hint {

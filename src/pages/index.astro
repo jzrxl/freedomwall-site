@@ -4,15 +4,10 @@ import SubmissionForm from '../components/SubmissionForm.astro';
 import ConfirmModal from '../components/ConfirmModal.astro';
 import WelcomeModal from '../components/WelcomeModal.astro';
 import Footer from '../components/Footer.astro';
-import Icon from '../components/Icon.astro';
 ---
 
 <Base title="SSU Freedom Wall">
-  <h1>
-    <Icon name="sparkle" class="h1-icon" />
-    SSU Freedom Wall
-    <Icon name="sparkle" class="h1-icon" />
-  </h1>
+  <h1>SSU Freedom Wall</h1>
   <p class="sub">Your submissions are fully anonymous, so rest assured.</p>
 
   <SubmissionForm />
@@ -22,18 +17,3 @@ import Icon from '../components/Icon.astro';
 
   <div class="toast" id="toast"></div>
 </Base>
-
-<style>
-  h1 {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.35em;
-  }
-  :global(.h1-icon) {
-    width: 0.55em;
-    height: 0.55em;
-    opacity: 0.85;
-    flex-shrink: 0;
-  }
-</style>
