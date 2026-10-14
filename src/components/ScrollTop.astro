@@ -1,0 +1,92 @@
+---
+---
+
+<button
+  type="button"
+  class="scroll-top"
+  id="scrollTop"
+  aria-label="Back to top"
+  hidden
+>
+  <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
+    <path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z"/>
+  </svg>
+</button>
+
+<style>
+  .scroll-top {
+    position: fixed;
+    bottom: 24px;
+    right: 20px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--accent);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow);
+    padding: 0;
+    z-index: 90;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.25s, transform 0.25s, background 0.2s, color 0.2s;
+  }
+
+  .scroll-top[hidden] { display: none; }
+
+  .scroll-top.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .scroll-top:hover {
+    background: var(--hover-bg);
+    transform: translateY(-2px);
+  }
+
+  .scroll-top:active {
+    transform: translateY(0) scale(0.94);
+  }
+
+  @media (max-width: 480px) {
+    .scroll-top {
+      width: 40px;
+      height: 40px;
+      bottom: 18px;
+      right: 16px;
+    }
+  }
+</style>
+
+<script>
+  (function () {
+    var btn = document.getElementById('scrollTop');
+    if (!btn) return;
+
+    var THRESHOLD = 400;
+
+    function check() {
+      var y = window.scrollY || window.pageYOffset || 0;
+      if (y > THRESHOLD) {
+        btn.hidden = false;
+        requestAnimationFrame(function () { btn.classList.add('visible'); });
+      } else {
+        btn.classList.remove('visible');
+        setTimeout(function () {
+          if ((window.scrollY || 0) <= THRESHOLD) btn.hidden = true;
+        }, 250);
+      }
+    }
+
+    btn.addEventListener('click', function () {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    window.addEventListener('scroll', check, { passive: true });
+    check();
+  })();
+</script>

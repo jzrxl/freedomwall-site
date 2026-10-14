@@ -1,6 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
-import Footer from '../components/Footer.astro';
+import ScrollTop from '../components/ScrollTop.astro';
 import Icon from '../components/Icon.astro';
 ---
 
@@ -108,9 +108,9 @@ import Icon from '../components/Icon.astro';
         <span>Astro</span>
       </p>
     </div>
-
-    <Footer />
   </div>
+
+  <ScrollTop />
 </Base>
 
 <style>
@@ -192,7 +192,6 @@ import Icon from '../components/Icon.astro';
 
   .about-card p:last-child { margin-bottom: 0; }
 
-  /* Steps */
   .steps {
     list-style: none;
     padding: 0;
@@ -244,7 +243,6 @@ import Icon from '../components/Icon.astro';
     font-weight: 500;
   }
 
-  /* Promise list with icons */
   .promises {
     list-style: none;
     padding: 0;
@@ -271,7 +269,6 @@ import Icon from '../components/Icon.astro';
     color: var(--accent-2);
   }
 
-  /* Rules as bullets */
   .rules {
     list-style: none;
     padding: 0;
@@ -306,7 +303,6 @@ import Icon from '../components/Icon.astro';
     font-style: italic;
   }
 
-  /* Credits */
   .credits {
     margin-top: 26px;
     text-align: center;
