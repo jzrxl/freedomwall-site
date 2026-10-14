@@ -1,14 +1,24 @@
 ---
+import Icon from './Icon.astro';
 ---
 
 <div class="overlay" id="overlay">
   <div class="modal">
-    <h2>Send this message?</h2>
-    <p class="hint">This is how it'll appear on the wall. Take one last look.</p>
+    <h2>
+      <Icon name="heart" class="h2-icon" />
+      Send this message?
+    </h2>
+    <p class="hint">Here's how it'll appear on the wall.</p>
     <div class="preview" id="preview"></div>
     <div class="actions">
-      <button type="button" class="cancel" id="cancelBtn">Go back</button>
-      <button type="button" class="confirm" id="confirmBtn">Yes, send it</button>
+      <button type="button" class="cancel" id="cancelBtn">
+        <Icon name="arrow-back" />
+        <span>Go back</span>
+      </button>
+      <button type="button" class="confirm" id="confirmBtn">
+        <Icon name="send" />
+        <span>Yes, send it</span>
+      </button>
     </div>
   </div>
 </div>
@@ -17,65 +27,90 @@
   .overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.7);
+    background: rgba(58, 39, 51, 0.45);
+    backdrop-filter: blur(6px);
     display: none;
     align-items: center;
     justify-content: center;
-    padding: 24px;
+    padding: 20px;
     z-index: 10;
   }
-
   .overlay.open { display: flex; }
 
   .modal {
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 16px;
-    max-width: 560px;
+    border-radius: var(--radius);
+    max-width: 520px;
     width: 100%;
-    padding: 28px;
+    padding: 26px 22px;
+    box-shadow: var(--shadow);
   }
 
-  .modal h2 { margin: 0 0 4px; font-size: 1.25rem; }
+  .modal h2 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 1.5rem;
+    margin: 0 0 6px;
+    display: flex;
+    align-items: center;
+    gap: 0.45em;
+  }
 
-  .hint { margin: 0 0 18px; color: var(--muted); font-size: 0.9rem; }
+  :global(.h2-icon) {
+    width: 0.85em;
+    height: 0.85em;
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+
+  .hint { margin: 0 0 16px; color: var(--muted); font-size: 0.9rem; font-weight: 500; }
 
   .preview {
-    background: #0f1115;
-    border: 1px solid var(--border);
-    border-radius: 10px;
+    background: #fffafc;
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
     padding: 16px;
-    font-size: 1rem;
+    font-size: 0.98rem;
     line-height: 1.55;
+    font-weight: 500;
     white-space: pre-wrap;
     word-wrap: break-word;
     max-height: 260px;
     overflow-y: auto;
   }
 
-  .actions { display: flex; gap: 10px; margin-top: 22px; }
+  .actions { display: flex; gap: 10px; margin-top: 20px; }
 
   .actions button {
     flex: 1;
     padding: 13px;
     font-size: 0.98rem;
-    font-weight: 600;
-    border-radius: 10px;
+    font-weight: 700;
+    font-family: inherit;
+    border-radius: 14px;
     border: none;
     cursor: pointer;
-    transition: background 0.15s;
+    transition: background 0.15s, opacity 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45em;
   }
 
   .cancel {
     background: transparent;
     color: var(--muted);
-    border: 1px solid var(--border);
+    border: 1.5px solid var(--border);
   }
+  .cancel:hover { background: #fff5f9; color: var(--text); }
 
-  .cancel:hover { background: #1f232c; color: var(--text); }
-
-  .confirm { background: var(--accent); color: #0b0d11; }
-  .confirm:hover { background: var(--accent-hover); }
+  .confirm {
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: #fff;
+    box-shadow: 0 6px 18px rgba(236, 72, 153, 0.3);
+  }
+  .confirm:hover { opacity: 0.94; }
 </style>
 
 <script>
@@ -95,14 +130,13 @@
   }
 
   cancelBtn?.addEventListener('click', close);
-
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && overlay.classList.contains('open')) close();
   });
 
   confirmBtn?.addEventListener('click', async () => {
     confirmBtn.disabled = true;
-    confirmBtn.textContent = 'Sending...';
+    confirmBtn.innerHTML = '<span>Sending...</span>';
 
     const finalText = (window as any).__finalText || '';
 
@@ -112,18 +146,17 @@
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: new URLSearchParams({ message: finalText }),
       });
-
       if (!res.ok) throw new Error();
 
       close();
       form?.reset();
-      counter.textContent = '0 / 2000';
+      counter.textContent = '0 / 500';
       showToast('Sent. Thank you for sharing.');
     } catch {
       showToast('Something went wrong. Please try again.');
     } finally {
       confirmBtn.disabled = false;
-      confirmBtn.textContent = 'Yes, send it';
+      confirmBtn.innerHTML = '<svg class="icon" viewBox="0 0 24 24" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg><span>Yes, send it</span>';
     }
   });
 </script>

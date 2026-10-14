@@ -1,11 +1,16 @@
 :root {
-  --bg: #0f1115;
-  --card: #171a21;
-  --border: #262b36;
-  --text: #e8eaed;
-  --muted: #9aa0a6;
-  --accent: #6ea8fe;
-  --accent-hover: #8bb9ff;
+  --bg-from: #fff0f5;
+  --bg-to: #ede4ff;
+  --card: #ffffff;
+  --text: #3a2733;
+  --muted: #9b8292;
+  --border: #f5d8e8;
+  --accent: #ec4899;
+  --accent-2: #a855f7;
+  --radius: 22px;
+  --shadow: 0 12px 40px rgba(236, 72, 153, 0.14);
+  --font-display: 'Caprasimo', Georgia, serif;
+  --font-body: 'Quicksand', ui-rounded, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 * { box-sizing: border-box; }
@@ -13,28 +18,46 @@
 body {
   margin: 0;
   min-height: 100vh;
-  background: var(--bg);
+  background: linear-gradient(135deg, var(--bg-from) 0%, var(--bg-to) 100%);
   color: var(--text);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: var(--font-body);
+  font-weight: 500;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px;
+  padding: 24px 16px;
 }
 
-.wrap { width: 100%; max-width: 760px; }
+.wrap { width: 100%; max-width: 640px; }
 
 h1 {
-  font-size: 2rem;
-  font-weight: 700;
-  margin: 0 0 6px;
+  font-family: var(--font-display);
+  font-size: 2.6rem;
+  font-weight: 400;
+  margin: 0 0 8px;
+  text-align: center;
+  line-height: 1.1;
   letter-spacing: -0.5px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .sub {
   color: var(--muted);
-  font-size: 0.95rem;
-  margin: 0 0 28px;
+  font-size: 0.98rem;
+  font-weight: 500;
+  margin: 0 0 26px;
+  text-align: center;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 26px 22px;
+  box-shadow: var(--shadow);
 }
 
 .toast {
@@ -42,18 +65,17 @@ h1 {
   bottom: 28px;
   left: 50%;
   transform: translateX(-50%) translateY(80px);
-  background: #1f232c;
+  background: var(--card);
   border: 1px solid var(--border);
   color: var(--text);
   padding: 14px 22px;
-  border-radius: 10px;
+  border-radius: 999px;
   font-size: 0.95rem;
+  font-weight: 600;
+  box-shadow: var(--shadow);
   opacity: 0;
-  transition: transform 0.25s, opacity 0.25s;
+  transition: transform 0.3s, opacity 0.3s;
   z-index: 20;
 }
 
-.toast.show {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
-}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
