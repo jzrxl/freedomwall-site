@@ -12,12 +12,7 @@ import Icon from '../components/Icon.astro';
     </a>
 
     <header class="about-hero">
-      <h1>
-        <Icon name="sparkle" class="h1-icon" />
-        About Me
-        <Icon name="sparkle" class="h1-icon" />
-      </h1>
-      <p class="sub">Hi. I made this.</p>
+      <h1>About Me</h1>
     </header>
 
     <section class="about-card">
@@ -132,21 +127,9 @@ import Icon from '../components/Icon.astro';
 
   h1 {
     font-size: 2.4rem;
-    margin-bottom: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.35em;
+    margin-bottom: 22px;
+    text-align: center;
   }
-
-  :global(.h1-icon) {
-    width: 0.55em;
-    height: 0.55em;
-    opacity: 0.85;
-    flex-shrink: 0;
-  }
-
-  .sub { margin-bottom: 0; }
 
   .about-card {
     background: var(--card);
