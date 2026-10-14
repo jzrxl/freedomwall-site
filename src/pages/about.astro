@@ -60,20 +60,20 @@ import Icon from '../components/Icon.astro';
     <section class="about-card">
       <div class="section-header">
         <Icon name="shield" class="section-icon" />
-        <h2>What I won't do</h2>
+        <h2>The promise</h2>
       </div>
       <ul class="promises">
         <li>
           <Icon name="lock" class="promise-icon" />
-          <span>I won't store anything about you. No names, no IPs, no device stuff. Only your words.</span>
+          <span>Nothing about you is stored. No names, no IPs, no device info. Only your words.</span>
         </li>
         <li>
           <Icon name="users" class="promise-icon" />
-          <span>I won't play favorites. Every message gets read the same way.</span>
+          <span>Every message is read the same way, no matter who sends it.</span>
         </li>
         <li>
           <Icon name="heart" class="promise-icon" />
-          <span>I won't let this turn into a place to hurt people. That's not what this is for.</span>
+          <span>This wall exists to lift people up, not to hurt them.</span>
         </li>
       </ul>
     </section>
@@ -81,13 +81,14 @@ import Icon from '../components/Icon.astro';
     <section class="about-card">
       <div class="section-header">
         <Icon name="leaf" class="section-icon" />
-        <h2>The one rule</h2>
+        <h2>Ground rules</h2>
       </div>
-      <p>
-        Don't be a jerk. No names, no doxxing, no threats. That's it. Everything
-        else, you're free.
-      </p>
-      <p class="footnote">If it breaks that rule, it doesn't go up. Simple.</p>
+      <ul class="rules">
+        <li>No names, no doxxing, no identifying details about others.</li>
+        <li>No hate speech, threats, or harassment.</li>
+        <li>Be honest, be kind, be human.</li>
+      </ul>
+      <p class="footnote">If it breaks the rules, it doesn't go up.</p>
     </section>
 
     <div class="credits">
@@ -169,7 +170,7 @@ import Icon from '../components/Icon.astro';
   }
 
   .section-icon {
-    font-size: 1.2rem;
+    font-size: 1.25rem;
     color: var(--accent);
     flex-shrink: 0;
   }
@@ -191,6 +192,7 @@ import Icon from '../components/Icon.astro';
 
   .about-card p:last-child { margin-bottom: 0; }
 
+  /* Steps */
   .steps {
     list-style: none;
     padding: 0;
@@ -242,27 +244,57 @@ import Icon from '../components/Icon.astro';
     font-weight: 500;
   }
 
+  /* Promise list with icons */
   .promises {
     list-style: none;
     padding: 0;
     margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
   }
 
   .promises li {
     display: flex;
     align-items: flex-start;
-    gap: 0.7em;
-    padding: 8px 0;
+    gap: 0.85em;
+    font-size: 0.95rem;
     line-height: 1.55;
+    color: var(--text);
+  }
+
+  .promises li .promise-icon {
+    flex-shrink: 0;
+    width: 1.25em;
+    height: 1.25em;
+    margin-top: 0.1em;
+    color: var(--accent-2);
+  }
+
+  /* Rules as bullets */
+  .rules {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .rules li {
+    position: relative;
+    padding: 7px 0 7px 1.5em;
+    line-height: 1.6;
     font-size: 0.95rem;
     color: var(--text);
   }
 
-  .promise-icon {
-    color: var(--accent-2);
-    font-size: 1.15rem;
-    flex-shrink: 0;
-    margin-top: 0.15em;
+  .rules li::before {
+    content: '';
+    position: absolute;
+    left: 0.35em;
+    top: 1.05em;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
   }
 
   .footnote {
@@ -274,6 +306,7 @@ import Icon from '../components/Icon.astro';
     font-style: italic;
   }
 
+  /* Credits */
   .credits {
     margin-top: 26px;
     text-align: center;
@@ -303,8 +336,9 @@ import Icon from '../components/Icon.astro';
   }
 
   .astro-icon {
-    width: 1.1em;
-    height: 1.1em;
+    width: 18px;
+    height: 18px;
     display: inline-block;
+    vertical-align: middle;
   }
 </style>
