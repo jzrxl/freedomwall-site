@@ -13,7 +13,7 @@ import Icon from './Icon.astro';
 
     <label class="image-option">
       <input type="checkbox" id="asImage" />
-      <span>Send as a card image instead of plain text</span>
+      <span>Send as image <em>(optional)</em></span>
     </label>
 
     <div class="meta">
@@ -71,6 +71,12 @@ import Icon from './Icon.astro';
   }
 
   .image-option:hover { color: var(--text); }
+
+  .image-option em {
+    font-style: italic;
+    font-size: 0.8rem;
+    opacity: 0.85;
+  }
 
   .meta {
     display: flex;
