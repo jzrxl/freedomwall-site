@@ -235,9 +235,15 @@ import Base from '../layouts/Base.astro';
     });
 
     // Bottom brand (Caprasimo, SSU blue, prominent)
-    ctx.font = '400 46px Caprasimo';
-    ctx.fillStyle = '#0054A6';
-    ctx.fillText('SSU Freedom Wall', W / 2, H - 70);
+    if (logoImg) {
+      const logoW = 380;
+      const logoH = Math.round((logoImg.height / logoImg.width) * logoW);
+      ctx.drawImage(logoImg, (W - logoW) / 2, H - 90 - logoH / 2, logoW, logoH);
+    } else {
+      ctx.font = '400 46px Caprasimo';
+      ctx.fillStyle = '#0054A6';
+      ctx.fillText('SSU Freedom Wall', W / 2, H - 70);
+    }
   }
 
   async function ready() {

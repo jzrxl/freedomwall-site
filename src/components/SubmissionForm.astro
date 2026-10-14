@@ -178,6 +178,18 @@ import Icon from './Icon.astro';
     let ctx = canvas.getContext('2d');
     if (!ctx) return null;
 
+    let logoImg: HTMLImageElement | null = null;
+    try {
+      logoImg = await new Promise<HTMLImageElement>((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = '/logo-mark.png';
+      });
+    } catch (e) {}
+
+
+
     function wrapText(c: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
       const out: string[] = [];
       for (const para of text.split('\n')) {
@@ -253,9 +265,15 @@ import Icon from './Icon.astro';
     });
 
     // Bottom brand (Caprasimo, SSU blue)
-    ctx.font = '400 46px Caprasimo';
-    ctx.fillStyle = '#0054A6';
-    ctx.fillText('SSU Freedom Wall', W / 2, H - 70);
+    if (logoImg) {
+      const logoW = 380;
+      const logoH = Math.round((logoImg.height / logoImg.width) * logoW);
+      ctx.drawImage(logoImg, (W - logoW) / 2, H - 90 - logoH / 2, logoW, logoH);
+    } else {
+      ctx.font = '400 46px Caprasimo';
+      ctx.fillStyle = '#0054A6';
+      ctx.fillText('SSU Freedom Wall', W / 2, H - 70);
+    }
 
     const dataUrl = canvas.toDataURL('image/png');
     return dataUrl.split(',')[1];
