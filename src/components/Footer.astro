@@ -2,18 +2,42 @@
 ---
 
 <footer class="site-footer">
-  <a
-    href="https://www.facebook.com/freedomwallssu"
-    class="fb-icon-btn"
-    target="_blank"
-    rel="noopener"
-    aria-label="SSU Freedom Wall on Facebook"
-    title="See what gets posted"
-  >
-    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <path d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5.02 3.66 9.18 8.44 9.94v-7.03H7.9v-2.91h2.54V9.85c0-2.52 1.5-3.91 3.77-3.91 1.09 0 2.24.2 2.24.2v2.47h-1.26c-1.24 0-1.63.78-1.63 1.57v1.88h2.78l-.45 2.91h-2.33V22c4.78-.76 8.44-4.92 8.44-9.94z"/>
+  <div class="fb-wrap">
+    <span class="fb-hint">check your submissions here</span>
+
+    <svg class="fb-arrow" viewBox="0 0 130 75" fill="none" aria-hidden="true">
+      <path
+        d="M 112 8 C 118 42, 70 55, 28 65"
+        stroke="currentColor"
+        stroke-width="1.7"
+        stroke-linecap="round"
+        stroke-dasharray="4 5"
+        opacity="0.7"
+      />
+      <path
+        d="M 46 57 L 26 65 L 42 74"
+        stroke="currentColor"
+        stroke-width="1.7"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        fill="none"
+        opacity="0.7"
+      />
     </svg>
-  </a>
+
+    <a
+      href="https://www.facebook.com/freedomwallssu"
+      class="fb-icon-btn"
+      target="_blank"
+      rel="noopener"
+      aria-label="SSU Freedom Wall on Facebook"
+      title="See what gets posted"
+    >
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5.02 3.66 9.18 8.44 9.94v-7.03H7.9v-2.91h2.54V9.85c0-2.52 1.5-3.91 3.77-3.91 1.09 0 2.24.2 2.24.2v2.47h-1.26c-1.24 0-1.63.78-1.63 1.57v1.88h2.78l-.45 2.91h-2.33V22c4.78-.76 8.44-4.92 8.44-9.94z"/>
+      </svg>
+    </a>
+  </div>
 
   <a href="/about" class="about-link">About Me</a>
 </footer>
@@ -24,10 +48,42 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 12px;
+    gap: 14px;
+  }
+
+  .fb-wrap {
+    display: grid;
+    grid-template-columns: auto;
+    justify-items: end;
+    row-gap: 0;
+    width: max-content;
+    max-width: 100%;
+    padding: 4px 8px;
+    margin: 0 auto;
+  }
+
+  .fb-hint {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--muted);
+    opacity: 0.85;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    margin-right: 4px;
+  }
+
+  .fb-arrow {
+    width: 130px;
+    height: 75px;
+    color: var(--muted);
+    margin-right: 24px;
+    margin-top: -4px;
+    margin-bottom: -10px;
   }
 
   .fb-icon-btn {
+    justify-self: start;
+    margin-left: 14px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -76,5 +132,10 @@
   .about-link:hover {
     color: var(--accent);
     background: var(--hover-bg);
+  }
+
+  @media (max-width: 360px) {
+    .fb-arrow { width: 100px; height: 60px; margin-right: 16px; }
+    .fb-hint { font-size: 0.72rem; }
   }
 </style>
