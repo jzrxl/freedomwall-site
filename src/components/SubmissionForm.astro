@@ -203,7 +203,7 @@ import Icon from './Icon.astro';
   async function generateCard(messageText: string): Promise<string | null> {
     try {
       await Promise.all([
-        document.fonts.load('400 58px Fraunces'),
+        document.fonts.load('400 72px Fraunces'),
         document.fonts.load('400 28px Fraunces'),
       ]);
       await document.fonts.ready;
@@ -220,7 +220,7 @@ import Icon from './Icon.astro';
     const PAD_X = 100;
     const TOP_PAD = 140;
     const FOOTER_H = 260;
-    const MIN_H = 1080;
+    const MIN_H = 720;
     const MAX_H = 3000;
 
     const canvas = document.createElement('canvas');
@@ -248,12 +248,12 @@ import Icon from './Icon.astro';
     }
 
     const maxTextWidth = W - PAD_X * 2;
-    let fontSize = 58;
+    let fontSize = 72;
     let lineHeight = 74;
     let lines: string[] = [];
     let textBlockH = 0;
 
-    for (let size = 58; size >= 28; size -= 2) {
+    for (let size = 72; size >= 28; size -= 2) {
       fontSize = size;
       lineHeight = Math.round(size * 1.28);
       const m = document.createElement('canvas');
