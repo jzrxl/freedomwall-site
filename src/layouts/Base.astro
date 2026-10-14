@@ -4,11 +4,13 @@ import '../styles/global.css';
 interface Props {
   title: string;
   description?: string;
+  noindex?: boolean;
 }
 
 const {
   title,
   description = "This wall solely exists because there's always stuff people can't say out loud. That's it.",
+  noindex = false,
 } = Astro.props;
 
 const siteUrl = 'https://freedomwallssu.pages.dev';
@@ -38,6 +40,7 @@ const ogImage = `${siteUrl}/logo.png`;
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content={description} />
   <meta name="darkreader-lock" />
+  <meta name="robots" content="noindex, nofollow" />
   <meta name="theme-color" content="#EAF3FB" />
 
   <!-- Favicon -->
