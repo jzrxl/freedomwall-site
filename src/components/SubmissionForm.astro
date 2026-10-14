@@ -92,9 +92,6 @@ import Icon from './Icon.astro';
     if (!msg) return;
 
     (window as any).__finalText = msg;
-    (window as any).__previewMessage = msg;
-
-    window.dispatchEvent(new CustomEvent('preview-ready'));
     document.getElementById('overlay')?.classList.add('open');
   });
 </script>

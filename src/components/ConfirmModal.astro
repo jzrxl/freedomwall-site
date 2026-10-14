@@ -5,14 +5,12 @@ import Icon from './Icon.astro';
 <div class="overlay" id="overlay">
   <div class="modal">
     <h2>Send this message?</h2>
-    <p class="hint">Here's how it'll appear on the wall.</p>
-
-    <div class="preview" id="preview"></div>
+    <p class="hint">Once it's sent, it can't be edited.</p>
 
     <div class="actions">
       <button type="button" class="cancel" id="cancelBtn">
         <Icon name="arrow-back" />
-        <span>Go back</span>
+        <span>Keep editing</span>
       </button>
       <button type="button" class="confirm" id="confirmBtn">
         <Icon name="send" />
@@ -40,48 +38,30 @@ import Icon from './Icon.astro';
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    max-width: 520px;
+    max-width: 420px;
     width: 100%;
     padding: 26px 22px;
     box-shadow: var(--shadow);
     transition: background 0.3s, border-color 0.3s;
+    text-align: center;
   }
 
   .modal h2 {
     font-family: var(--font-display);
     font-weight: 400;
     font-size: 1.5rem;
-    margin: 0 0 6px;
-    display: flex;
-    align-items: center;
-    gap: 0.45em;
+    margin: 0 0 8px;
     color: var(--text);
   }
 
   .hint {
-    margin: 0 0 16px;
+    margin: 0 0 22px;
     color: var(--muted);
     font-size: 0.9rem;
     font-weight: 500;
   }
 
-  .preview {
-    background: var(--preview-bg);
-    border: 1.5px solid var(--border);
-    border-radius: 14px;
-    padding: 18px 20px;
-    font-size: 1rem;
-    line-height: 1.6;
-    font-weight: 500;
-    color: var(--text);
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    max-height: 340px;
-    overflow-y: auto;
-    transition: background 0.3s, border-color 0.3s, color 0.3s;
-  }
-
-  .actions { display: flex; gap: 10px; margin-top: 20px; }
+  .actions { display: flex; gap: 10px; }
 
   .actions button {
     flex: 1;
@@ -121,7 +101,6 @@ import Icon from './Icon.astro';
   const toast = document.getElementById('toast')!;
   const form = document.getElementById('form') as HTMLFormElement;
   const counter = document.getElementById('counter')!;
-  const preview = document.getElementById('preview')!;
 
   function close() { overlay.classList.remove('open'); }
 
@@ -130,10 +109,6 @@ import Icon from './Icon.astro';
     toast.classList.add('show');
     setTimeout(() => toast.classList.remove('show'), 3000);
   }
-
-  window.addEventListener('preview-ready', () => {
-    preview.textContent = (window as any).__previewMessage || '';
-  });
 
   cancelBtn?.addEventListener('click', close);
   document.addEventListener('keydown', (e) => {
