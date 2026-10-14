@@ -145,6 +145,7 @@
 
 <script>
   (function () {
+    var trapHandler = null;
     var KEY = 'fw_seen_welcome';
     var overlay = document.getElementById('welcomeOverlay');
     var closeBtn = document.getElementById('welcomeClose');
@@ -160,8 +161,28 @@
     // show it
     overlay.hidden = false;
 
+    var focusables = [closeBtn, okBtn].filter(Boolean);
+    setTimeout(function () {
+      if (focusables[0]) focusables[0].focus();
+    }, 50);
+
+    trapHandler = function (e) {
+      if (e.key !== 'Tab') return;
+      var idx = focusables.indexOf(document.activeElement);
+      e.preventDefault();
+      var next = e.shiftKey
+        ? (idx <= 0 ? focusables.length - 1 : idx - 1)
+        : (idx >= focusables.length - 1 || idx === -1 ? 0 : idx + 1);
+      focusables[next].focus();
+    };
+    document.addEventListener('keydown', trapHandler, true);
+
     function dismiss() {
       overlay.hidden = true;
+      if (trapHandler) {
+        document.removeEventListener('keydown', trapHandler, true);
+        trapHandler = null;
+      }
       try { localStorage.setItem(KEY, '1'); } catch (e) {}
     }
 

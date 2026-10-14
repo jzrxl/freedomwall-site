@@ -3,8 +3,8 @@ import Icon from './Icon.astro';
 ---
 
 <div class="overlay" id="overlay">
-  <div class="modal">
-    <h2>Send this message?</h2>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+    <h2 id="confirmTitle">Send this message?</h2>
     <p class="hint">Once it's sent, it can't be edited.</p>
 
     <div class="actions">
@@ -44,6 +44,7 @@ import Icon from './Icon.astro';
     box-shadow: var(--shadow);
     transition: background 0.3s, border-color 0.3s;
     text-align: center;
+    outline: none;
   }
 
   .modal h2 {
@@ -96,19 +97,55 @@ import Icon from './Icon.astro';
 
 <script>
   const overlay = document.getElementById('overlay')!;
-  const cancelBtn = document.getElementById('cancelBtn')!;
+  const modal = overlay.querySelector('.modal') as HTMLElement;
+  const cancelBtn = document.getElementById('cancelBtn') as HTMLButtonElement;
   const confirmBtn = document.getElementById('confirmBtn') as HTMLButtonElement;
   const toast = document.getElementById('toast')!;
   const form = document.getElementById('form') as HTMLFormElement;
   const counter = document.getElementById('counter')!;
+  const message = document.getElementById('message') as HTMLTextAreaElement | null;
 
-  function close() { overlay.classList.remove('open'); }
+  let trapHandler: ((e: KeyboardEvent) => void) | null = null;
+
+  function installFocusTrap() {
+    const focusables = [cancelBtn, confirmBtn];
+    cancelBtn.focus();
+
+    trapHandler = (e: KeyboardEvent) => {
+      if (e.key === 'Tab') {
+        const idx = focusables.indexOf(document.activeElement as HTMLButtonElement);
+        e.preventDefault();
+        const next = e.shiftKey
+          ? (idx <= 0 ? focusables.length - 1 : idx - 1)
+          : (idx >= focusables.length - 1 || idx === -1 ? 0 : idx + 1);
+        focusables[next].focus();
+      }
+    };
+    document.addEventListener('keydown', trapHandler, true);
+  }
+
+  function removeFocusTrap() {
+    if (trapHandler) {
+      document.removeEventListener('keydown', trapHandler, true);
+      trapHandler = null;
+    }
+  }
+
+  function close() {
+    overlay.classList.remove('open');
+    removeFocusTrap();
+    message?.focus();
+  }
 
   function showToast(text: string) {
     toast.textContent = text;
     toast.classList.add('show');
     setTimeout(() => toast.classList.remove('show'), 3000);
   }
+
+  window.addEventListener('confirm-open', () => {
+    installFocusTrap();
+  });
 
   cancelBtn?.addEventListener('click', close);
   document.addEventListener('keydown', (e) => {
@@ -129,9 +166,12 @@ import Icon from './Icon.astro';
       });
       if (!res.ok) throw new Error();
 
-      close();
+      overlay.classList.remove('open');
+      removeFocusTrap();
       form?.reset();
       counter.textContent = '0 / 5000';
+      counter.parentElement?.classList.remove('count-warn', 'count-danger');
+      try { localStorage.removeItem('fw_draft'); } catch (e) {}
       showToast('Sent. Thank you for sharing.');
     } catch {
       showToast('Something went wrong. Please try again.');

@@ -11,14 +11,14 @@ import Icon from './Icon.astro';
       required
     ></textarea>
     <div class="meta">
-      <span>Nothing is stored except your words.</span>
       <span id="counter">0 / 5000</span>
     </div>
 
     <button class="btn" type="submit">
       <Icon name="send" />
-      <span>Preview &amp; send</span>
+      <span>Send</span>
     </button>
+    <p class="shortcut-hint">Tip: press Ctrl + Enter to send</p>
   </div>
 </form>
 
@@ -45,13 +45,18 @@ import Icon from './Icon.astro';
 
   .meta {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
     margin-top: 10px;
     font-size: 0.83rem;
     font-weight: 500;
     color: var(--muted);
+    transition: color 0.2s;
   }
+  .meta.count-warn #counter { color: #d97706; font-weight: 700; }
+  .meta.count-danger #counter { color: #dc2626; font-weight: 700; }
+  [data-theme="dark"] .meta.count-warn #counter { color: #fbbf24; }
+  [data-theme="dark"] .meta.count-danger #counter { color: #f87171; }
 
   .btn {
     margin-top: 16px;
@@ -74,24 +79,70 @@ import Icon from './Icon.astro';
   }
   .btn:hover { box-shadow: 0 10px 28px rgba(0, 84, 166, 0.36); opacity: 0.96; }
   .btn:active { transform: scale(0.98); }
+
+  .shortcut-hint {
+    margin: 10px 0 0;
+    text-align: center;
+    font-size: 0.76rem;
+    color: var(--muted);
+    opacity: 0.75;
+  }
+  @media (max-width: 640px) {
+    .shortcut-hint { display: none; }
+  }
 </style>
 
 <script>
+  const DRAFT_KEY = 'fw_draft';
+  const MAX = 5000;
+  const WARN_AT = 4500;
+  const DANGER_AT = 4900;
+
   const form = document.getElementById('form') as HTMLFormElement;
   const message = document.getElementById('message') as HTMLTextAreaElement;
   const counter = document.getElementById('counter')!;
+  const meta = counter.parentElement!;
 
+  function updateCounter() {
+    const len = message.value.length;
+    counter.textContent = `${len} / ${MAX}`;
+    meta.classList.toggle('count-warn', len >= WARN_AT && len < DANGER_AT);
+    meta.classList.toggle('count-danger', len >= DANGER_AT);
+  }
+
+  // #5 — restore draft on load
+  try {
+    const saved = localStorage.getItem(DRAFT_KEY);
+    if (saved) {
+      message.value = saved;
+      updateCounter();
+    }
+  } catch (e) {}
+
+  // #5 — save draft on input, debounced
+  let saveTimer: number | undefined;
   message?.addEventListener('input', () => {
-    counter.textContent = `${message.value.length} / 5000`;
+    updateCounter();
+    clearTimeout(saveTimer);
+    saveTimer = window.setTimeout(() => {
+      try { localStorage.setItem(DRAFT_KEY, message.value); } catch (e) {}
+    }, 400);
+  });
+
+  // #4 — Ctrl/Cmd + Enter to send
+  message?.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      e.preventDefault();
+      if (message.value.trim()) form.requestSubmit();
+    }
   });
 
   form?.addEventListener('submit', (e) => {
     e.preventDefault();
-
     const msg = message.value.trim();
     if (!msg) return;
-
     (window as any).__finalText = msg;
     document.getElementById('overlay')?.classList.add('open');
+    window.dispatchEvent(new CustomEvent('confirm-open'));
   });
 </script>
