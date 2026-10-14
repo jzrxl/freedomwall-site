@@ -1,0 +1,142 @@
+---
+---
+
+<form id="form">
+  <div class="row">
+    <label for="audience">From / To <span class="hint">(College or Program)</span></label>
+    <input
+      type="text"
+      id="audience"
+      maxlength="80"
+      placeholder="e.g. CCS, BSIT, College of Engineering"
+      required
+    />
+  </div>
+
+  <div class="row">
+    <label for="message">Message</label>
+    <textarea
+      id="message"
+      maxlength="2000"
+      placeholder="Say what you can't say directly..."
+      required
+    ></textarea>
+    <div class="meta">
+      <span>Nothing is stored except your words.</span>
+      <span id="counter">0 / 2000</span>
+    </div>
+  </div>
+
+  <div class="row">
+    <label for="sender">From <span class="hint">(desired name or moniker)</span></label>
+    <input
+      type="text"
+      id="sender"
+      maxlength="40"
+      placeholder="Anonymous"
+    />
+  </div>
+
+  <button class="btn" type="submit">Preview &amp; send</button>
+</form>
+
+<style>
+  .row { margin-bottom: 20px; }
+
+  label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .hint { font-weight: 400; color: var(--muted); font-size: 0.82rem; }
+
+  input[type="text"] {
+    width: 100%;
+    padding: 13px 16px;
+    font-size: 1rem;
+    font-family: inherit;
+    color: var(--text);
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  input[type="text"]:focus { border-color: var(--accent); }
+  input[type="text"]::placeholder { color: #5f6672; }
+
+  textarea {
+    width: 100%;
+    min-height: 280px;
+    resize: vertical;
+    padding: 20px;
+    font-size: 1.05rem;
+    line-height: 1.6;
+    font-family: inherit;
+    color: var(--text);
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  textarea:focus { border-color: var(--accent); }
+  textarea::placeholder { color: #5f6672; }
+
+  .meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 8px;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+
+  .btn {
+    margin-top: 8px;
+    width: 100%;
+    padding: 16px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #0b0d11;
+    background: var(--accent);
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.05s;
+  }
+
+  .btn:hover { background: var(--accent-hover); }
+  .btn:active { transform: scale(0.99); }
+</style>
+
+<script>
+  const form = document.getElementById('form') as HTMLFormElement;
+  const message = document.getElementById('message') as HTMLTextAreaElement;
+  const audience = document.getElementById('audience') as HTMLInputElement;
+  const sender = document.getElementById('sender') as HTMLInputElement;
+  const counter = document.getElementById('counter')!;
+
+  message?.addEventListener('input', () => {
+    counter.textContent = `${message.value.length} / 2000`;
+  });
+
+  function buildFinalText(): string {
+    const aud = audience.value.trim() || 'Everyone';
+    const msg = message.value.trim();
+    const from = sender.value.trim() || 'Anonymous';
+    return `From/To [${aud}]:\n\n${msg}\n\n[From (Desired name or moniker)]: ${from}`;
+  }
+
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    (window as any).__finalText = buildFinalText();
+    const preview = document.getElementById('preview');
+    if (preview) preview.textContent = (window as any).__finalText;
+    document.getElementById('overlay')?.classList.add('open');
+  });
+</script>

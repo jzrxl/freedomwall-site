@@ -1,0 +1,15 @@
+---
+import Base from '../layouts/Base.astro';
+import SubmissionForm from '../components/SubmissionForm.astro';
+import ConfirmModal from '../components/ConfirmModal.astro';
+---
+
+<Base title="SSU Freedom Wall">
+  <h1>SSU Freedom Wall</h1>
+  <p class="sub">Your submissions are fully anonymous, so rest assured.</p>
+
+  <SubmissionForm />
+  <ConfirmModal />
+
+  <div class="toast" id="toast"></div>
+</Base>
