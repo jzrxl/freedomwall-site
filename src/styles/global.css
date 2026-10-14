@@ -64,7 +64,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px 16px 90px;
+  padding: 40px 20px 60px;
   -webkit-text-size-adjust: 100%;
   transition: background 0.3s, color 0.3s;
 }
