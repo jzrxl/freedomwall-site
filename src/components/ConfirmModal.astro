@@ -26,6 +26,12 @@ import Icon from './Icon.astro';
 </div>
 
 <style>
+  /* lock light theme inside the modal */
+  .overlay, .modal, .preview {
+    color-scheme: only light;
+    forced-color-adjust: none;
+  }
+
   .overlay {
     position: fixed;
     inset: 0;
@@ -40,8 +46,8 @@ import Icon from './Icon.astro';
   .overlay.open { display: flex; }
 
   .modal {
-    background: var(--card);
-    border: 1px solid var(--border);
+    background: #ffffff;
+    border: 1px solid #f5d8e8;
     border-radius: var(--radius);
     max-width: 520px;
     width: 100%;
@@ -57,6 +63,7 @@ import Icon from './Icon.astro';
     display: flex;
     align-items: center;
     gap: 0.45em;
+    color: var(--text);
   }
 
   :global(.h2-icon) {
@@ -66,11 +73,16 @@ import Icon from './Icon.astro';
     flex-shrink: 0;
   }
 
-  .hint { margin: 0 0 16px; color: var(--muted); font-size: 0.9rem; font-weight: 500; }
+  .hint {
+    margin: 0 0 16px;
+    color: var(--muted);
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
 
   .preview {
     background: #fffafc;
-    border: 1.5px solid var(--border);
+    border: 1.5px solid #f5d8e8;
     border-radius: 14px;
     padding: 18px 20px;
     font-size: 1rem;
@@ -99,21 +111,33 @@ import Icon from './Icon.astro';
     align-items: center;
     justify-content: center;
     gap: 0.45em;
+    forced-color-adjust: none;
+    color-scheme: only light;
   }
 
   .cancel {
     background: transparent;
-    color: var(--muted);
-    border: 1.5px solid var(--border);
+    color: #9b8292;
+    border: 1.5px solid #f5d8e8;
   }
-  .cancel:hover { background: #fff5f9; color: var(--text); }
+  .cancel:hover { background: #fff5f9; color: #3a2733; }
 
   .confirm {
-    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    background: linear-gradient(135deg, #ec4899, #a855f7);
     color: #fff;
     box-shadow: 0 6px 18px rgba(236, 72, 153, 0.3);
   }
   .confirm:hover { opacity: 0.94; }
+
+  /* reassert palette if the OS or browser forces dark */
+  @media (prefers-color-scheme: dark) {
+    .modal { background: #ffffff; border-color: #f5d8e8; }
+    .modal h2 { color: #3a2733; }
+    .hint { color: #9b8292; }
+    .preview { background: #fffafc; border-color: #f5d8e8; color: #3a2733; }
+    .cancel { color: #9b8292; border-color: #f5d8e8; }
+    .cancel:hover { background: #fff5f9; color: #3a2733; }
+  }
 </style>
 
 <script>
