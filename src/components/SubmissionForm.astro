@@ -160,9 +160,8 @@ import Icon from './Icon.astro';
   async function generateCard(messageText: string): Promise<string | null> {
     try {
       await Promise.all([
-        document.fonts.load('500 60px Quicksand'),
-        document.fonts.load('500 34px Quicksand'),
-        document.fonts.load('600 22px Quicksand'),
+        document.fonts.load('400 60px Fraunces'),
+        document.fonts.load('400 34px Fraunces'),
         document.fonts.load('400 46px Caprasimo'),
       ]);
       await document.fonts.ready;
@@ -170,8 +169,8 @@ import Icon from './Icon.astro';
 
     const W = 1080;
     const PAD_X = 100;
-    const TOP_BRAND_H = 90;
-    const BOTTOM_BRAND_H = 130;
+    const TOP_PAD = 140;
+    const BOTTOM_BRAND_H = 160;
     const MIN_H = 1080;
     const MAX_H = 2400;
 
@@ -200,21 +199,21 @@ import Icon from './Icon.astro';
     }
 
     const maxTextWidth = W - PAD_X * 2;
-    let fontSize = 60;
-    let lineHeight = 78;
+    let fontSize = 58;
+    let lineHeight = 74;
     let lines: string[] = [];
     let textBlockH = 0;
     let totalH = MIN_H;
 
-    for (let size = 60; size >= 34; size -= 2) {
+    for (let size = 58; size >= 30; size -= 2) {
       fontSize = size;
-      lineHeight = Math.round(size * 1.3);
+      lineHeight = Math.round(size * 1.28);
       const m = document.createElement('canvas');
       const mctx = m.getContext('2d')!;
-      mctx.font = `500 ${fontSize}px Quicksand`;
+      mctx.font = `400 ${fontSize}px Fraunces`;
       lines = wrapText(mctx, messageText, maxTextWidth);
       textBlockH = lines.length * lineHeight;
-      totalH = TOP_BRAND_H + textBlockH + BOTTOM_BRAND_H;
+      totalH = TOP_PAD + textBlockH + BOTTOM_BRAND_H;
       if (totalH <= MAX_H) break;
     }
 
@@ -223,12 +222,14 @@ import Icon from './Icon.astro';
     canvas.height = H;
     ctx = canvas.getContext('2d')!;
 
+    // Background gradient
     const grad = ctx.createLinearGradient(0, 0, W, H);
     grad.addColorStop(0, '#EAF3FB');
     grad.addColorStop(1, '#FFF6DE');
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, W, H);
 
+    // Corner ornaments
     ctx.fillStyle = 'rgba(0, 84, 166, 0.08)';
     ctx.beginPath();
     ctx.arc(0, 0, 280, 0, Math.PI * 2);
@@ -239,20 +240,19 @@ import Icon from './Icon.astro';
     ctx.arc(W, H, 320, 0, Math.PI * 2);
     ctx.fill();
 
+    // Body message (centered, serif)
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-
-    ctx.font = '600 22px Quicksand';
-    ctx.fillStyle = '#6B8099';
-    ctx.fillText('SSU FREEDOM WALL', W / 2, 60);
-
-    ctx.font = `500 ${fontSize}px Quicksand`;
+    ctx.font = `400 ${fontSize}px Fraunces`;
     ctx.fillStyle = '#142B44';
-    const bodyStartY = TOP_BRAND_H + (H - TOP_BRAND_H - BOTTOM_BRAND_H) / 2 - textBlockH / 2 + lineHeight / 2;
+
+    const contentArea = H - TOP_PAD - BOTTOM_BRAND_H;
+    const bodyStartY = TOP_PAD + contentArea / 2 - textBlockH / 2 + lineHeight / 2;
     lines.forEach((line, i) => {
       ctx.fillText(line, W / 2, bodyStartY + i * lineHeight);
     });
 
+    // Bottom brand (Caprasimo, SSU blue)
     ctx.font = '400 46px Caprasimo';
     ctx.fillStyle = '#0054A6';
     ctx.fillText('SSU Freedom Wall', W / 2, H - 70);

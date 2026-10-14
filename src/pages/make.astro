@@ -151,8 +151,8 @@ import Base from '../layouts/Base.astro';
 
   const W = 1080;
   const PAD_X = 100;
-  const TOP_BRAND_H = 90;
-  const BOTTOM_BRAND_H = 130;
+  const TOP_PAD = 140;
+  const BOTTOM_BRAND_H = 160;
   const MIN_H = 1080;
   const MAX_H = 2400;
 
@@ -181,21 +181,21 @@ import Base from '../layouts/Base.astro';
 
     // Try font sizes from big to small until the whole card fits within MAX_H
     const maxTextWidth = W - PAD_X * 2;
-    let fontSize = 60;
-    let lineHeight = 78;
+    let fontSize = 58;
+    let lineHeight = 74;
     let lines: string[] = [];
     let textBlockH = 0;
     let totalH = MIN_H;
 
-    for (let size = 60; size >= 34; size -= 2) {
+    for (let size = 58; size >= 30; size -= 2) {
       fontSize = size;
-      lineHeight = Math.round(size * 1.3);
+      lineHeight = Math.round(size * 1.28);
       const measureCanvas = document.createElement('canvas');
       const mctx = measureCanvas.getContext('2d')!;
-      mctx.font = `500 ${fontSize}px Quicksand`;
+      mctx.font = `400 ${fontSize}px Fraunces`;
       lines = wrapText(mctx, raw, maxTextWidth);
       textBlockH = lines.length * lineHeight;
-      totalH = TOP_BRAND_H + textBlockH + BOTTOM_BRAND_H;
+      totalH = TOP_PAD + textBlockH + BOTTOM_BRAND_H;
       if (totalH <= MAX_H) break;
     }
 
@@ -224,14 +224,12 @@ import Base from '../layouts/Base.astro';
     // Top brand (small, centered, muted)
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.font = '600 22px Quicksand';
-    ctx.fillStyle = '#6B8099';
-    ctx.fillText('SSU FREEDOM WALL', W / 2, 60);
 
     // Body text (centered, vertically centered between brand rows)
-    ctx.font = `500 ${fontSize}px Quicksand`;
+    ctx.font = `400 ${fontSize}px Fraunces`;
     ctx.fillStyle = '#142B44';
-    const bodyStartY = TOP_BRAND_H + (H - TOP_BRAND_H - BOTTOM_BRAND_H) / 2 - textBlockH / 2 + lineHeight / 2;
+    const contentArea = H - TOP_PAD - BOTTOM_BRAND_H;
+    const bodyStartY = TOP_PAD + contentArea / 2 - textBlockH / 2 + lineHeight / 2;
     lines.forEach((line, i) => {
       ctx.fillText(line, W / 2, bodyStartY + i * lineHeight);
     });
@@ -245,9 +243,9 @@ import Base from '../layouts/Base.astro';
   async function ready() {
     try {
       await Promise.all([
-        document.fonts.load('500 60px Quicksand'),
-        document.fonts.load('500 34px Quicksand'),
-        document.fonts.load('600 22px Quicksand'),
+        document.fonts.load('400 60px Fraunces'),
+        document.fonts.load('400 34px Fraunces'),
+        document.fonts.load('400 46px Caprasimo'),
         document.fonts.load('400 46px Caprasimo'),
       ]);
       await document.fonts.ready;
