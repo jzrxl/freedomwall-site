@@ -1,0 +1,82 @@
+---
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex" />
+  <title>404 · SSU Freedom Wall</title>
+
+  <script is:inline>
+    (function () {
+      try {
+        var stored = localStorage.getItem('theme');
+        var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        var theme = (stored === 'light' || stored === 'dark')
+          ? stored
+          : (prefersDark ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
+
+  <style>
+    :root {
+      --bg-from: #EAF3FB;
+      --bg-to: #FFF6DE;
+    }
+    [data-theme="dark"] {
+      --bg-from: #0A1828;
+      --bg-to: #13273E;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }
+
+    body {
+      background: linear-gradient(135deg, var(--bg-from) 0%, var(--bg-to) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+    }
+
+    .video-wrap {
+      width: 100%;
+      max-width: 640px;
+    }
+
+    video {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 22px;
+      background: #000;
+      outline: none;
+      box-shadow: 0 12px 40px rgba(0, 84, 166, 0.15);
+    }
+  </style>
+</head>
+<body>
+  <div class="video-wrap">
+    <video
+      src="/kalaindaw.mp4"
+      autoplay
+      loop
+      muted
+      playsinline
+      controls
+      preload="metadata"
+    ></video>
+  </div>
+</body>
+</html>
