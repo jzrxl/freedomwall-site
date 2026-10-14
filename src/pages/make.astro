@@ -206,20 +206,56 @@ import Base from '../layouts/Base.astro';
     canvas.height = H;
     const ctx = canvas.getContext('2d')!;
 
-    const grad = ctx.createLinearGradient(0, 0, W, H);
-    grad.addColorStop(0, '#EAF3FB');
-    grad.addColorStop(1, '#FFF6DE');
-    ctx.fillStyle = grad;
+    ctx.fillStyle = '#0A1828';
     ctx.fillRect(0, 0, W, H);
 
-    ctx.fillStyle = 'rgba(0, 84, 166, 0.08)';
-    ctx.beginPath();
-    ctx.arc(0, 0, 280, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = 'rgba(255, 199, 44, 0.10)';
-    ctx.beginPath();
-    ctx.arc(W, H, 320, 0, Math.PI * 2);
-    ctx.fill();
+    const vignette = ctx.createRadialGradient(W/2, H/3, 100, W/2, H/2, Math.max(W, H));
+    vignette.addColorStop(0, 'rgba(20, 43, 68, 0.6)');
+    vignette.addColorStop(1, 'rgba(10, 24, 40, 0)');
+    ctx.fillStyle = vignette;
+    ctx.fillRect(0, 0, W, H);
+
+    function sampleGradient(t: number) {
+      const stops = [
+        { t: 0, c: [92, 165, 224] },
+        { t: 0.5, c: [123, 183, 230] },
+        { t: 1, c: [255, 199, 44] },
+      ];
+      for (let i = 0; i < stops.length - 1; i++) {
+        if (t >= stops[i].t && t <= stops[i + 1].t) {
+          const local = (t - stops[i].t) / (stops[i + 1].t - stops[i].t);
+          return {
+            r: Math.round(stops[i].c[0] + (stops[i + 1].c[0] - stops[i].c[0]) * local),
+            g: Math.round(stops[i].c[1] + (stops[i + 1].c[1] - stops[i].c[1]) * local),
+            b: Math.round(stops[i].c[2] + (stops[i + 1].c[2] - stops[i].c[2]) * local),
+          };
+        }
+      }
+      return { r: 92, g: 165, b: 224 };
+    }
+
+    const particles = 2600;
+    for (let i = 0; i < particles; i++) {
+      const t = Math.random();
+      const diagX = t * (W + H);
+      const diagY = diagX;
+      const r = (Math.random() + Math.random() + Math.random() - 1.5) * 220;
+      const angle = Math.PI / 4;
+      const perpX = -Math.sin(angle);
+      const perpY = Math.cos(angle);
+      const x = diagX + perpX * r;
+      const y = diagY + perpY * r;
+      if (x < -50 || x > W + 50 || y < -50 || y > H + 50) continue;
+      const colorT = Math.max(0, Math.min(1, (x + y) / (W + H)));
+      const c = sampleGradient(colorT);
+      const edge = Math.abs(r) / 220;
+      const size = Math.max(0.5, 2.5 * (1 - edge * 0.6) * (0.4 + Math.random() * 0.8));
+      const alpha = Math.max(0.05, (1 - edge) * (0.3 + Math.random() * 0.5));
+      ctx.fillStyle = `rgba(${c.r}, ${c.g}, ${c.b}, ${alpha})`;
+      ctx.beginPath();
+      ctx.arc(x, y, size, 0, Math.PI * 2);
+      ctx.fill();
+    }
 
     const contentTop = TOP_PAD;
     const contentBottom = TOP_PAD + contentH;
@@ -229,13 +265,16 @@ import Base from '../layouts/Base.astro';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.font = `400 ${fontSize}px Fraunces`;
-    ctx.fillStyle = '#142B44';
+    ctx.fillStyle = '#F1F4F8';
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.45)';
+    ctx.shadowBlur = 12;
     lines.forEach((line, i) => {
       ctx.fillText(line, W / 2, bodyStartY + i * lineHeight);
     });
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur = 0;
 
-    const footerTop = H - FOOTER_H;
-    const footerCy = footerTop + FOOTER_H / 2;
+    const footerCy = H - FOOTER_H / 2;
     if (logo) {
       const logoMaxW = 380;
       const logoMaxH = 100;
@@ -246,7 +285,7 @@ import Base from '../layouts/Base.astro';
       ctx.drawImage(logo, (W - lw) / 2, footerCy - lh / 2, lw, lh);
     } else {
       ctx.font = '400 46px Caprasimo';
-      ctx.fillStyle = '#0054A6';
+      ctx.fillStyle = '#FFC72C';
       ctx.fillText('SSU Freedom Wall', W / 2, footerCy);
     }
   }
