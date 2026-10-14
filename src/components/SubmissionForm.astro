@@ -6,13 +6,13 @@ import Icon from './Icon.astro';
   <div class="card">
     <textarea
       id="message"
-      maxlength="500"
+      maxlength="5000"
       placeholder="Share your thoughts, your name won't be shown."
       required
     ></textarea>
     <div class="meta">
       <span>Nothing is stored except your words.</span>
-      <span id="counter">0 / 500</span>
+      <span id="counter">0 / 5000</span>
     </div>
 
     <button class="btn" type="submit">
@@ -32,18 +32,16 @@ import Icon from './Icon.astro';
     line-height: 1.6;
     font-family: inherit;
     font-weight: 500;
-    color: #142B44;
-    background: #F7FAFD;
-    border: 1.5px solid #D5E3F2;
+    color: var(--text);
+    background: var(--input-bg);
+    border: 1.5px solid var(--border);
     border-radius: 16px;
     outline: none;
-    transition: border-color 0.15s, background 0.15s;
+    transition: border-color 0.15s, background 0.3s, color 0.3s;
     display: block;
-    forced-color-adjust: none;
-    color-scheme: only light;
   }
-  textarea:focus { border-color: #0054A6; background: #ffffff; }
-  textarea::placeholder { color: #9BB0C9; }
+  textarea:focus { border-color: var(--accent); background: var(--card); }
+  textarea::placeholder { color: var(--placeholder); }
 
   .meta {
     display: flex;
@@ -52,7 +50,7 @@ import Icon from './Icon.astro';
     margin-top: 10px;
     font-size: 0.83rem;
     font-weight: 500;
-    color: #6B8099;
+    color: var(--muted);
   }
 
   .btn {
@@ -73,17 +71,9 @@ import Icon from './Icon.astro';
     align-items: center;
     justify-content: center;
     gap: 0.5em;
-    forced-color-adjust: none;
-    color-scheme: only light;
   }
   .btn:hover { box-shadow: 0 10px 28px rgba(0, 84, 166, 0.36); opacity: 0.96; }
   .btn:active { transform: scale(0.98); }
-
-  @media (prefers-color-scheme: dark) {
-    textarea { background: #F7FAFD; color: #142B44; border-color: #D5E3F2; }
-    .meta { color: #6B8099; }
-    .btn { color: #ffffff; }
-  }
 </style>
 
 <script>
@@ -92,7 +82,7 @@ import Icon from './Icon.astro';
   const counter = document.getElementById('counter')!;
 
   message?.addEventListener('input', () => {
-    counter.textContent = `${message.value.length} / 500`;
+    counter.textContent = `${message.value.length} / 5000`;
   });
 
   form?.addEventListener('submit', (e) => {

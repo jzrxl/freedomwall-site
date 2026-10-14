@@ -4,7 +4,7 @@ import Footer from '../components/Footer.astro';
 import Icon from '../components/Icon.astro';
 ---
 
-<Base title="About Us · SSU Freedom Wall">
+<Base title="About Me · SSU Freedom Wall">
   <div class="about-page">
     <a href="/" class="back-link">
       <Icon name="arrow-back" />
@@ -14,26 +14,20 @@ import Icon from '../components/Icon.astro';
     <header class="about-hero">
       <h1>
         <Icon name="sparkle" class="h1-icon" />
-        About Us
+        About Me
         <Icon name="sparkle" class="h1-icon" />
       </h1>
-      <p class="sub">A quiet space for thoughts that need somewhere to go.</p>
+      <p class="sub">Hi. I made this.</p>
     </header>
 
     <section class="about-card">
-      <div class="section-header">
-        <Icon name="info" class="section-icon" />
-        <h2>What is the Freedom Wall?</h2>
-      </div>
       <p>
-        SSU Freedom Wall is a small, anonymous space for the SSU community to
-        speak freely. No names. No sign-up. No trace. Just your words, in a
-        place where they can finally be heard.
+        I'm a freshman from BINDTECH ELXT-1A. I built this wall because there's
+        always stuff people can't say out loud — things you'd tell a friend at
+        3am but not to a face at 3pm.
       </p>
       <p>
-        Whether it's something you've been holding in, a message you can't say
-        out loud, or a thought you want to leave somewhere quiet — this wall is
-        for you.
+        So here we are. No name, no sign-up, no trace. Just say it.
       </p>
     </section>
 
@@ -46,22 +40,22 @@ import Icon from '../components/Icon.astro';
         <li>
           <span class="step-num">1</span>
           <div>
-            <strong>Write your message.</strong>
-            <span>Say what you need to say — up to 500 characters.</span>
+            <strong>Type it out.</strong>
+            <span>Whatever's been sitting on your chest. Up to 5000 characters.</span>
           </div>
         </li>
         <li>
           <span class="step-num">2</span>
           <div>
-            <strong>Preview it.</strong>
-            <span>See exactly how it'll look before you send it. Nothing goes out until you say so.</span>
+            <strong>Check it.</strong>
+            <span>You'll see how it looks before it goes anywhere.</span>
           </div>
         </li>
         <li>
           <span class="step-num">3</span>
           <div>
-            <strong>Send it anonymously.</strong>
-            <span>Your message is delivered without your name, device, or identity attached.</span>
+            <strong>Send it.</strong>
+            <span>Done. Nobody knows it came from you.</span>
           </div>
         </li>
       </ol>
@@ -70,20 +64,20 @@ import Icon from '../components/Icon.astro';
     <section class="about-card">
       <div class="section-header">
         <Icon name="shield" class="section-icon" />
-        <h2>Our promise</h2>
+        <h2>What I won't do</h2>
       </div>
       <ul class="promises">
         <li>
           <Icon name="lock" class="promise-icon" />
-          <span>Nothing is stored except your words — no names, no IPs, no device info.</span>
+          <span>I won't store anything about you. No names, no IPs, no device stuff. Only your words.</span>
         </li>
         <li>
           <Icon name="users" class="promise-icon" />
-          <span>Every submission is treated the same, no matter who you are.</span>
+          <span>I won't play favorites. Every message gets read the same way.</span>
         </li>
         <li>
           <Icon name="heart" class="promise-icon" />
-          <span>This wall exists to lift people up — not to tear anyone down.</span>
+          <span>I won't let this turn into a place to hurt people. That's not what this is for.</span>
         </li>
       </ul>
     </section>
@@ -91,14 +85,13 @@ import Icon from '../components/Icon.astro';
     <section class="about-card">
       <div class="section-header">
         <Icon name="leaf" class="section-icon" />
-        <h2>Ground rules</h2>
+        <h2>The one rule</h2>
       </div>
-      <ul class="rules">
-        <li>No names, no doxxing, no identifying details about others.</li>
-        <li>No hate speech, threats, or harassment — anonymous or not.</li>
-        <li>Be honest, be kind, be human. That's all we ask.</li>
-      </ul>
-      <p class="footnote">Messages that break these rules won't make it to the wall.</p>
+      <p>
+        Don't be a jerk. No names, no doxxing, no threats. That's it. Everything
+        else, you're free.
+      </p>
+      <p class="footnote">If it breaks that rule, it doesn't go up. Simple.</p>
     </section>
 
     <div class="credits">
@@ -133,14 +126,14 @@ import Icon from '../components/Icon.astro';
     gap: 0.4em;
     font-size: 0.85rem;
     font-weight: 600;
-    color: #6B8099;
+    color: var(--muted);
     text-decoration: none;
     margin-bottom: 18px;
     padding: 6px 12px;
     border-radius: 999px;
     transition: background 0.15s, color 0.15s;
   }
-  .back-link:hover { background: #EAF3FB; color: #0054A6; }
+  .back-link:hover { background: var(--hover-bg); color: var(--accent); }
   .back-link :global(.icon) { font-size: 1.05em; }
 
   .about-hero { margin-bottom: 22px; }
@@ -148,17 +141,29 @@ import Icon from '../components/Icon.astro';
   h1 {
     font-size: 2.4rem;
     margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35em;
+  }
+
+  :global(.h1-icon) {
+    width: 0.55em;
+    height: 0.55em;
+    opacity: 0.85;
+    flex-shrink: 0;
   }
 
   .sub { margin-bottom: 0; }
 
   .about-card {
-    background: #FFFFFF;
-    border: 1px solid #D5E3F2;
+    background: var(--card);
+    border: 1px solid var(--border);
     border-radius: var(--radius);
     padding: 22px 22px;
     box-shadow: var(--shadow);
-    margin-bottom: 16px;
+    margin-bottom: 14px;
+    transition: background 0.3s, border-color 0.3s;
   }
 
   .section-header {
@@ -170,7 +175,7 @@ import Icon from '../components/Icon.astro';
 
   .section-icon {
     font-size: 1.2rem;
-    color: #0054A6;
+    color: var(--accent);
     flex-shrink: 0;
   }
 
@@ -179,24 +184,22 @@ import Icon from '../components/Icon.astro';
     font-weight: 400;
     font-size: 1.35rem;
     margin: 0;
-    color: #142B44;
+    color: var(--text);
   }
 
   .about-card p {
     margin: 0 0 12px;
     line-height: 1.7;
-    color: #142B44;
+    color: var(--text);
     font-size: 0.97rem;
   }
 
   .about-card p:last-child { margin-bottom: 0; }
 
-  /* Steps */
   .steps {
     list-style: none;
     padding: 0;
     margin: 0;
-    counter-reset: step;
   }
 
   .steps li {
@@ -204,7 +207,7 @@ import Icon from '../components/Icon.astro';
     gap: 0.85em;
     align-items: flex-start;
     padding: 10px 0;
-    border-bottom: 1px solid #EAF3FB;
+    border-bottom: 1px solid var(--divider);
   }
 
   .steps li:last-child { border-bottom: none; padding-bottom: 0; }
@@ -234,18 +237,17 @@ import Icon from '../components/Icon.astro';
 
   .steps li strong {
     font-size: 0.96rem;
-    color: #142B44;
+    color: var(--text);
     font-weight: 700;
   }
 
   .steps li span {
     font-size: 0.9rem;
-    color: #6B8099;
+    color: var(--muted);
     font-weight: 500;
   }
 
-  /* Promises */
-  .promises, .rules {
+  .promises {
     list-style: none;
     padding: 0;
     margin: 0;
@@ -258,46 +260,25 @@ import Icon from '../components/Icon.astro';
     padding: 8px 0;
     line-height: 1.55;
     font-size: 0.95rem;
-    color: #142B44;
+    color: var(--text);
   }
 
   .promise-icon {
-    color: #FFC72C;
+    color: var(--accent-2);
     font-size: 1.15rem;
     flex-shrink: 0;
     margin-top: 0.15em;
   }
 
-  /* Rules */
-  .rules li {
-    position: relative;
-    padding: 8px 0 8px 1.4em;
-    line-height: 1.55;
-    font-size: 0.95rem;
-    color: #142B44;
-  }
-
-  .rules li::before {
-    content: '';
-    position: absolute;
-    left: 0.35em;
-    top: 1.05em;
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    background: #0054A6;
-  }
-
   .footnote {
-    margin-top: 12px !important;
+    margin-top: 14px !important;
     padding-top: 12px;
-    border-top: 1px dashed #D5E3F2;
-    font-size: 0.85rem !important;
-    color: #6B8099 !important;
+    border-top: 1px dashed var(--dashed);
+    font-size: 0.88rem !important;
+    color: var(--muted) !important;
     font-style: italic;
   }
 
-  /* Credits */
   .credits {
     margin-top: 26px;
     text-align: center;
@@ -306,7 +287,7 @@ import Icon from '../components/Icon.astro';
   .credit-line {
     margin: 0 0 8px;
     font-size: 0.88rem;
-    color: #6B8099;
+    color: var(--muted);
     font-weight: 500;
     line-height: 1.5;
   }
@@ -314,7 +295,7 @@ import Icon from '../components/Icon.astro';
   .credit-line:last-child { margin-bottom: 0; }
 
   .credit-line strong {
-    color: #0054A6;
+    color: var(--accent);
     font-weight: 700;
   }
 

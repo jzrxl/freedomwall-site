@@ -7,27 +7,27 @@
 
 <style>
   .site-footer {
-    margin-top: 26px;
+    margin-top: 28px;
     text-align: center;
   }
 
   .about-link {
     display: inline-block;
-    font-size: 0.82rem;
+    font-size: 0.88rem;
     font-weight: 600;
-    color: #9BB0C9;
+    color: var(--footer-link);
     text-decoration: none;
-    opacity: 0.65;
-    transition: opacity 0.2s, color 0.2s, letter-spacing 0.2s;
-    letter-spacing: 0.03em;
-    padding: 6px 14px;
+    opacity: 1;
+    transition: color 0.2s, background 0.2s;
+    letter-spacing: 0.04em;
+    padding: 8px 18px;
     border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--card);
   }
 
   .about-link:hover {
-    opacity: 1;
-    color: #0054A6;
-    letter-spacing: 0.08em;
-    background: rgba(0, 84, 166, 0.05);
+    color: var(--accent);
+    background: var(--hover-bg);
   }
 </style>

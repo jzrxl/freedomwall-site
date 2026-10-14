@@ -26,15 +26,10 @@ import Icon from './Icon.astro';
 </div>
 
 <style>
-  .overlay, .modal, .preview {
-    color-scheme: only light;
-    forced-color-adjust: none;
-  }
-
   .overlay {
     position: fixed;
     inset: 0;
-    background: rgba(20, 43, 68, 0.45);
+    background: var(--overlay);
     backdrop-filter: blur(6px);
     display: none;
     align-items: center;
@@ -45,13 +40,14 @@ import Icon from './Icon.astro';
   .overlay.open { display: flex; }
 
   .modal {
-    background: #ffffff;
-    border: 1px solid #D5E3F2;
+    background: var(--card);
+    border: 1px solid var(--border);
     border-radius: var(--radius);
     max-width: 520px;
     width: 100%;
     padding: 26px 22px;
     box-shadow: var(--shadow);
+    transition: background 0.3s, border-color 0.3s;
   }
 
   .modal h2 {
@@ -62,36 +58,37 @@ import Icon from './Icon.astro';
     display: flex;
     align-items: center;
     gap: 0.45em;
-    color: #142B44;
+    color: var(--text);
   }
 
   :global(.h2-icon) {
     width: 0.85em;
     height: 0.85em;
-    color: #0054A6;
+    color: var(--accent);
     flex-shrink: 0;
   }
 
   .hint {
     margin: 0 0 16px;
-    color: #6B8099;
+    color: var(--muted);
     font-size: 0.9rem;
     font-weight: 500;
   }
 
   .preview {
-    background: #F7FAFD;
-    border: 1.5px solid #D5E3F2;
+    background: var(--preview-bg);
+    border: 1.5px solid var(--border);
     border-radius: 14px;
     padding: 18px 20px;
     font-size: 1rem;
     line-height: 1.6;
     font-weight: 500;
-    color: #142B44;
+    color: var(--text);
     white-space: pre-wrap;
     word-wrap: break-word;
-    max-height: 300px;
+    max-height: 340px;
     overflow-y: auto;
+    transition: background 0.3s, border-color 0.3s, color 0.3s;
   }
 
   .actions { display: flex; gap: 10px; margin-top: 20px; }
@@ -105,21 +102,19 @@ import Icon from './Icon.astro';
     border-radius: 14px;
     border: none;
     cursor: pointer;
-    transition: background 0.15s, opacity 0.15s;
+    transition: background 0.15s, opacity 0.15s, color 0.3s, border-color 0.3s;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 0.45em;
-    forced-color-adjust: none;
-    color-scheme: only light;
   }
 
   .cancel {
     background: transparent;
-    color: #6B8099;
-    border: 1.5px solid #D5E3F2;
+    color: var(--muted);
+    border: 1.5px solid var(--border);
   }
-  .cancel:hover { background: #EAF3FB; color: #142B44; }
+  .cancel:hover { background: var(--hover-bg); color: var(--text); }
 
   .confirm {
     background: var(--grad);
@@ -127,16 +122,6 @@ import Icon from './Icon.astro';
     box-shadow: 0 6px 18px rgba(0, 84, 166, 0.3);
   }
   .confirm:hover { opacity: 0.94; }
-
-  @media (prefers-color-scheme: dark) {
-    .modal { background: #ffffff; border-color: #D5E3F2; }
-    .modal h2 { color: #142B44; }
-    .hint { color: #6B8099; }
-    .preview { background: #F7FAFD; border-color: #D5E3F2; color: #142B44; }
-    .cancel { color: #6B8099; border-color: #D5E3F2; }
-    .cancel:hover { background: #EAF3FB; color: #142B44; }
-    .confirm { color: #ffffff; }
-  }
 </style>
 
 <script>
@@ -181,7 +166,7 @@ import Icon from './Icon.astro';
 
       close();
       form?.reset();
-      counter.textContent = '0 / 500';
+      counter.textContent = '0 / 5000';
       showToast('Sent. Thank you for sharing.');
     } catch {
       showToast('Something went wrong. Please try again.');
