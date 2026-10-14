@@ -10,6 +10,12 @@ import Icon from './Icon.astro';
       placeholder="Share your thoughts, your name won't be shown."
       required
     ></textarea>
+
+    <label class="image-option">
+      <input type="checkbox" id="asImage" />
+      <span>Send as a card image instead of plain text</span>
+    </label>
+
     <div class="meta">
       <span id="counter">0 / 5000</span>
     </div>
@@ -43,11 +49,34 @@ import Icon from './Icon.astro';
   textarea:focus { border-color: var(--accent); background: var(--card); }
   textarea::placeholder { color: var(--placeholder); }
 
+  .image-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+    user-select: none;
+    padding: 4px 0;
+  }
+
+  .image-option input[type="checkbox"] {
+    width: 15px;
+    height: 15px;
+    accent-color: var(--accent);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .image-option:hover { color: var(--text); }
+
   .meta {
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    margin-top: 10px;
+    margin-top: 6px;
     font-size: 0.83rem;
     font-weight: 500;
     color: var(--muted);
@@ -102,6 +131,7 @@ import Icon from './Icon.astro';
   const message = document.getElementById('message') as HTMLTextAreaElement;
   const counter = document.getElementById('counter')!;
   const meta = counter.parentElement!;
+  const asImage = document.getElementById('asImage') as HTMLInputElement;
 
   function updateCounter() {
     const len = message.value.length;
@@ -110,7 +140,6 @@ import Icon from './Icon.astro';
     meta.classList.toggle('count-danger', len >= DANGER_AT);
   }
 
-  // #5 — restore draft on load
   try {
     const saved = localStorage.getItem(DRAFT_KEY);
     if (saved) {
@@ -119,7 +148,6 @@ import Icon from './Icon.astro';
     }
   } catch (e) {}
 
-  // #5 — save draft on input, debounced
   let saveTimer: number | undefined;
   message?.addEventListener('input', () => {
     updateCounter();
@@ -129,7 +157,6 @@ import Icon from './Icon.astro';
     }, 400);
   });
 
-  // #4 — Ctrl/Cmd + Enter to send
   message?.addEventListener('keydown', (e) => {
     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
       e.preventDefault();
@@ -137,11 +164,132 @@ import Icon from './Icon.astro';
     }
   });
 
-  form?.addEventListener('submit', (e) => {
+  async function generateCard(messageText: string): Promise<string | null> {
+    try {
+      await Promise.all([
+        document.fonts.load('600 24px Quicksand'),
+        document.fonts.load('500 46px Quicksand'),
+        document.fonts.load('600 22px Quicksand'),
+      ]);
+      await document.fonts.ready;
+    } catch (e) {}
+
+    const W = 1080;
+    const PAD_X = 90;
+    const MIN_H = 1350;
+    const HEADER_H = 180;
+    const FOOTER_H = 200;
+    const BODY_PAD = 60;
+    const MAX_H = 3000;
+
+    const canvas = document.createElement('canvas');
+    let ctx = canvas.getContext('2d');
+    if (!ctx) return null;
+
+    function wrapText(text: string, maxWidth: number): string[] {
+      const out: string[] = [];
+      for (const para of text.split('\n')) {
+        if (para.trim() === '') { out.push(''); continue; }
+        const words = para.split(/\s+/);
+        let line = '';
+        for (const word of words) {
+          const test = line ? line + ' ' + word : word;
+          if (ctx!.measureText(test).width > maxWidth && line) {
+            out.push(line);
+            line = word;
+          } else {
+            line = test;
+          }
+        }
+        if (line) out.push(line);
+      }
+      return out;
+    }
+
+    const maxTextWidth = W - PAD_X * 2 - 40;
+    let fontSize = 46;
+    let lineHeight = 70;
+    let lines: string[] = [];
+    let bodyHeight = 0;
+
+    for (let size = 46; size >= 30; size -= 2) {
+      fontSize = size;
+      lineHeight = Math.round(size * 1.5);
+      ctx.font = `500 ${fontSize}px Quicksand`;
+      lines = wrapText(messageText, maxTextWidth);
+      bodyHeight = lines.length * lineHeight;
+      if (HEADER_H + BODY_PAD + bodyHeight + BODY_PAD + FOOTER_H <= MAX_H) break;
+    }
+
+    const computedH = HEADER_H + BODY_PAD + bodyHeight + BODY_PAD + FOOTER_H;
+    const H = Math.max(MIN_H, computedH);
+    canvas.width = W;
+    canvas.height = H;
+
+    ctx = canvas.getContext('2d')!;
+
+    const grad = ctx.createLinearGradient(0, 0, W, H);
+    grad.addColorStop(0, '#EAF3FB');
+    grad.addColorStop(1, '#FFF6DE');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+    ctx.fillStyle = '#0054A6';
+    ctx.beginPath();
+    ctx.arc(PAD_X + 5, 82, 5, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.font = '600 24px Quicksand';
+    ctx.fillStyle = '#6B8099';
+    ctx.fillText('ssu freedom wall', PAD_X + 24, 70);
+
+    const barX = PAD_X - 26;
+    const barY = HEADER_H + BODY_PAD - 6;
+    ctx.fillStyle = '#0054A6';
+    ctx.fillRect(barX, barY, 5, bodyHeight + 12);
+
+    ctx.font = `500 ${fontSize}px Quicksand`;
+    ctx.fillStyle = '#142B44';
+    const bodyStartY = HEADER_H + BODY_PAD;
+    lines.forEach((line, i) => {
+      ctx.fillText(line, PAD_X, bodyStartY + i * lineHeight);
+    });
+
+    const footerTop = H - FOOTER_H + 40;
+    ctx.strokeStyle = 'rgba(20, 43, 68, 0.12)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(PAD_X, footerTop);
+    ctx.lineTo(W - PAD_X, footerTop);
+    ctx.stroke();
+
+    ctx.textAlign = 'right';
+    ctx.font = '600 22px Quicksand';
+    ctx.fillStyle = '#0054A6';
+    ctx.fillText('SSU Freedom Wall', W - PAD_X, footerTop + 46);
+
+    const dataUrl = canvas.toDataURL('image/png');
+    return dataUrl.split(',')[1];
+  }
+
+  form?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const msg = message.value.trim();
     if (!msg) return;
+
+    let imageBase64: string | null = null;
+    if (asImage?.checked) {
+      imageBase64 = await generateCard(msg);
+      if (!imageBase64) {
+        alert('Could not generate the card. Try again or uncheck the image option.');
+        return;
+      }
+    }
+
     (window as any).__finalText = msg;
+    (window as any).__finalImage = imageBase64;
     document.getElementById('overlay')?.classList.add('open');
     window.dispatchEvent(new CustomEvent('confirm-open'));
   });

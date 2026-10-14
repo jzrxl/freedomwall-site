@@ -97,20 +97,19 @@ import Icon from './Icon.astro';
 
 <script>
   const overlay = document.getElementById('overlay')!;
-  const modal = overlay.querySelector('.modal') as HTMLElement;
   const cancelBtn = document.getElementById('cancelBtn') as HTMLButtonElement;
   const confirmBtn = document.getElementById('confirmBtn') as HTMLButtonElement;
   const toast = document.getElementById('toast')!;
   const form = document.getElementById('form') as HTMLFormElement;
   const counter = document.getElementById('counter')!;
   const message = document.getElementById('message') as HTMLTextAreaElement | null;
+  const asImage = document.getElementById('asImage') as HTMLInputElement | null;
 
   let trapHandler: ((e: KeyboardEvent) => void) | null = null;
 
   function installFocusTrap() {
     const focusables = [cancelBtn, confirmBtn];
     cancelBtn.focus();
-
     trapHandler = (e: KeyboardEvent) => {
       if (e.key === 'Tab') {
         const idx = focusables.indexOf(document.activeElement as HTMLButtonElement);
@@ -143,9 +142,7 @@ import Icon from './Icon.astro';
     setTimeout(() => toast.classList.remove('show'), 3000);
   }
 
-  window.addEventListener('confirm-open', () => {
-    installFocusTrap();
-  });
+  window.addEventListener('confirm-open', () => installFocusTrap());
 
   cancelBtn?.addEventListener('click', close);
   document.addEventListener('keydown', (e) => {
@@ -157,21 +154,29 @@ import Icon from './Icon.astro';
     confirmBtn.innerHTML = '<span>Sending...</span>';
 
     const finalText = (window as any).__finalText || '';
+    const finalImage = (window as any).__finalImage as string | null;
+
+    const params = new URLSearchParams({ message: finalText });
+    if (finalImage) {
+      params.set('imageBase64', finalImage);
+    }
 
     try {
       const res = await fetch('/api/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({ message: finalText }),
+        body: params,
       });
       if (!res.ok) throw new Error();
 
       overlay.classList.remove('open');
       removeFocusTrap();
       form?.reset();
+      if (asImage) asImage.checked = false;
       counter.textContent = '0 / 5000';
       counter.parentElement?.classList.remove('count-warn', 'count-danger');
       try { localStorage.removeItem('fw_draft'); } catch (e) {}
+      (window as any).__finalImage = null;
       showToast('Sent. Thank you for sharing.');
     } catch {
       showToast('Something went wrong. Please try again.');

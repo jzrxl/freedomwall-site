@@ -1,7 +1,10 @@
 export async function onRequestPost({ request, env }) {
   const form = await request.formData();
   const msg = (form.get("message") || "").trim();
-  if (!msg) return new Response("Empty", { status: 400 });
+  const imageBase64 = form.get("imageBase64");
+  const hasImage = typeof imageBase64 === "string" && imageBase64.length > 1000;
+
+  if (!msg && !hasImage) return new Response("Empty", { status: 400 });
 
   const token = env.GITHUB_TOKEN;
   const repo = env.GITHUB_REPO;
@@ -54,11 +57,16 @@ export async function onRequestPost({ request, env }) {
   }
 
   const n = maxN + 1;
-  const path = `${folder}/(${n}) ${time}.md`;
+  const ext = hasImage ? "png" : "md";
+  const path = `${folder}/(${n}) ${time}.${ext}`;
+
+  const content = hasImage
+    ? imageBase64
+    : btoa(unescape(encodeURIComponent(msg)));
 
   const body = {
     message: `submission ${monthFolder}/${dayFolder} (${n}) ${time}`,
-    content: btoa(unescape(encodeURIComponent(msg))),
+    content,
   };
 
   const res = await fetch(
