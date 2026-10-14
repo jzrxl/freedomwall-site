@@ -27,16 +27,6 @@ import Icon from '../components/Icon.astro';
       </p>
     </section>
 
-    <section class="about-card video-card">
-      <video
-        class="about-video"
-        src="/kalaindaw.mp4"
-        controls
-        playsinline
-        preload="metadata"
-      ></video>
-    </section>
-
     <section class="about-card">
       <div class="section-header">
         <Icon name="pencil" class="section-icon" />
@@ -170,23 +160,6 @@ import Icon from '../components/Icon.astro';
     box-shadow: var(--shadow);
     margin-bottom: 14px;
     transition: background 0.3s, border-color 0.3s;
-  }
-
-  .video-card {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 14px;
-  }
-
-  .about-video {
-    display: block;
-    width: 100%;
-    max-width: 100%;
-    height: auto;
-    border-radius: calc(var(--radius) - 8px);
-    background: #000;
-    outline: none;
   }
 
   .section-header {
