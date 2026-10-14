@@ -149,14 +149,16 @@ import Base from '../layouts/Base.astro';
   const copyBtn = document.getElementById('copy') as HTMLButtonElement;
   const status = document.getElementById('status')!;
 
+  let logo: HTMLImageElement | null = null;
+
   const W = 1080;
   const PAD_X = 100;
   const TOP_PAD = 140;
-  const BOTTOM_BRAND_H = 160;
+  const FOOTER_H = 260;
   const MIN_H = 1080;
-  const MAX_H = 2400;
+  const MAX_H = 3000;
 
-  function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
+  function wrapText(c: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
     const out: string[] = [];
     for (const para of text.split('\n')) {
       if (para.trim() === '') { out.push(''); continue; }
@@ -164,7 +166,7 @@ import Base from '../layouts/Base.astro';
       let line = '';
       for (const word of words) {
         const test = line ? line + ' ' + word : word;
-        if (ctx.measureText(test).width > maxWidth && line) {
+        if (c.measureText(test).width > maxWidth && line) {
           out.push(line);
           line = word;
         } else {
@@ -179,39 +181,37 @@ import Base from '../layouts/Base.astro';
   function draw() {
     const raw = msgInput.value.trim() || 'Your message will appear here.';
 
-    // Try font sizes from big to small until the whole card fits within MAX_H
     const maxTextWidth = W - PAD_X * 2;
     let fontSize = 58;
     let lineHeight = 74;
     let lines: string[] = [];
     let textBlockH = 0;
-    let totalH = MIN_H;
 
-    for (let size = 58; size >= 30; size -= 2) {
+    for (let size = 58; size >= 28; size -= 2) {
       fontSize = size;
       lineHeight = Math.round(size * 1.28);
-      const measureCanvas = document.createElement('canvas');
-      const mctx = measureCanvas.getContext('2d')!;
+      const m = document.createElement('canvas');
+      const mctx = m.getContext('2d')!;
       mctx.font = `400 ${fontSize}px Fraunces`;
       lines = wrapText(mctx, raw, maxTextWidth);
       textBlockH = lines.length * lineHeight;
-      totalH = TOP_PAD + textBlockH + BOTTOM_BRAND_H;
-      if (totalH <= MAX_H) break;
+      const candidate = TOP_PAD + textBlockH + 60 + FOOTER_H;
+      if (candidate <= MAX_H) break;
     }
 
-    const H = Math.max(MIN_H, Math.min(MAX_H, totalH));
+    const contentH = textBlockH + 60;
+    const H = Math.max(MIN_H, TOP_PAD + contentH + FOOTER_H);
+
     canvas.width = W;
     canvas.height = H;
     const ctx = canvas.getContext('2d')!;
 
-    // Background gradient
     const grad = ctx.createLinearGradient(0, 0, W, H);
     grad.addColorStop(0, '#EAF3FB');
     grad.addColorStop(1, '#FFF6DE');
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, W, H);
 
-    // Subtle corner ornament (top-left + bottom-right)
     ctx.fillStyle = 'rgba(0, 84, 166, 0.08)';
     ctx.beginPath();
     ctx.arc(0, 0, 280, 0, Math.PI * 2);
@@ -221,41 +221,52 @@ import Base from '../layouts/Base.astro';
     ctx.arc(W, H, 320, 0, Math.PI * 2);
     ctx.fill();
 
-    // Top brand (small, centered, muted)
+    const contentTop = TOP_PAD;
+    const contentBottom = TOP_PAD + contentH;
+    const contentMidY = (contentTop + contentBottom) / 2;
+    const bodyStartY = contentMidY - textBlockH / 2 + lineHeight / 2;
+
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-
-    // Body text (centered, vertically centered between brand rows)
     ctx.font = `400 ${fontSize}px Fraunces`;
     ctx.fillStyle = '#142B44';
-    const contentArea = H - TOP_PAD - BOTTOM_BRAND_H;
-    const bodyStartY = TOP_PAD + contentArea / 2 - textBlockH / 2 + lineHeight / 2;
     lines.forEach((line, i) => {
       ctx.fillText(line, W / 2, bodyStartY + i * lineHeight);
     });
 
-    // Bottom brand (Caprasimo, SSU blue, prominent)
-    if (logoImg) {
-      const logoW = 380;
-      const logoH = Math.round((logoImg.height / logoImg.width) * logoW);
-      ctx.drawImage(logoImg, (W - logoW) / 2, H - 90 - logoH / 2, logoW, logoH);
+    const footerTop = H - FOOTER_H;
+    const footerCy = footerTop + FOOTER_H / 2;
+    if (logo) {
+      const logoMaxW = 380;
+      const logoMaxH = 100;
+      const ratio = logo.width / logo.height;
+      let lw = logoMaxW;
+      let lh = lw / ratio;
+      if (lh > logoMaxH) { lh = logoMaxH; lw = lh * ratio; }
+      ctx.drawImage(logo, (W - lw) / 2, footerCy - lh / 2, lw, lh);
     } else {
       ctx.font = '400 46px Caprasimo';
       ctx.fillStyle = '#0054A6';
-      ctx.fillText('SSU Freedom Wall', W / 2, H - 70);
+      ctx.fillText('SSU Freedom Wall', W / 2, footerCy);
     }
   }
 
   async function ready() {
     try {
       await Promise.all([
-        document.fonts.load('400 60px Fraunces'),
-        document.fonts.load('400 34px Fraunces'),
-        document.fonts.load('400 46px Caprasimo'),
-        document.fonts.load('400 46px Caprasimo'),
+        document.fonts.load('400 58px Fraunces'),
+        document.fonts.load('400 28px Fraunces'),
       ]);
       await document.fonts.ready;
     } catch (e) {}
+
+    logo = await new Promise<HTMLImageElement | null>((resolve) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = () => resolve(null);
+      img.src = '/logo-mark.png';
+    });
+
     draw();
   }
 
