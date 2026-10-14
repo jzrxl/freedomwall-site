@@ -9,7 +9,22 @@ import Icon from './Icon.astro';
       Send this message?
     </h2>
     <p class="hint">Here's how it'll appear on the wall.</p>
-    <div class="preview" id="preview"></div>
+
+    <div class="preview">
+      <div class="preview-row">
+        <span class="preview-label">To:</span>
+        <span class="preview-value" id="previewTo"></span>
+      </div>
+      <div class="preview-row preview-row-message">
+        <span class="preview-label">Message:</span>
+        <span class="preview-value preview-message" id="previewMessage"></span>
+      </div>
+      <div class="preview-row">
+        <span class="preview-label">From:</span>
+        <span class="preview-value preview-from" id="previewFrom"></span>
+      </div>
+    </div>
+
     <div class="actions">
       <button type="button" class="cancel" id="cancelBtn">
         <Icon name="arrow-back" />
@@ -70,15 +85,40 @@ import Icon from './Icon.astro';
     background: #fffafc;
     border: 1.5px solid var(--border);
     border-radius: 14px;
-    padding: 16px;
+    padding: 18px 20px;
     font-size: 0.98rem;
-    line-height: 1.55;
+    line-height: 1.6;
     font-weight: 500;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    max-height: 260px;
+    max-height: 280px;
     overflow-y: auto;
   }
+
+  .preview-row {
+    display: flex;
+    gap: 0.5em;
+    align-items: baseline;
+    margin-bottom: 10px;
+  }
+  .preview-row:last-child { margin-bottom: 0; }
+
+  .preview-label {
+    font-weight: 700;
+    color: var(--accent);
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+  }
+
+  .preview-value {
+    color: var(--text);
+    word-wrap: break-word;
+    flex: 1;
+  }
+
+  .preview-message { white-space: pre-wrap; }
+
+  .preview-from { font-style: italic; color: var(--muted); }
 
   .actions { display: flex; gap: 10px; margin-top: 20px; }
 
@@ -120,6 +160,9 @@ import Icon from './Icon.astro';
   const toast = document.getElementById('toast')!;
   const form = document.getElementById('form') as HTMLFormElement;
   const counter = document.getElementById('counter')!;
+  const previewTo = document.getElementById('previewTo')!;
+  const previewMessage = document.getElementById('previewMessage')!;
+  const previewFrom = document.getElementById('previewFrom')!;
 
   function close() { overlay.classList.remove('open'); }
 
@@ -128,6 +171,14 @@ import Icon from './Icon.astro';
     toast.classList.add('show');
     setTimeout(() => toast.classList.remove('show'), 3000);
   }
+
+  window.addEventListener('preview-ready', () => {
+    const data = (window as any).__previewData;
+    if (!data) return;
+    previewTo.textContent = data.to;
+    previewMessage.textContent = data.message;
+    previewFrom.textContent = data.from;
+  });
 
   cancelBtn?.addEventListener('click', close);
   document.addEventListener('keydown', (e) => {

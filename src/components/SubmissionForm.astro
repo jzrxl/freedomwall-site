@@ -5,12 +5,12 @@ import Icon from './Icon.astro';
 <form id="form">
   <div class="card">
     <div class="row">
-      <label for="audience">From / To <span class="hint">(College or Program)</span></label>
+      <label for="audience">To <span class="hint">(College or Program)</span></label>
       <input type="text" id="audience" maxlength="80" placeholder="e.g. CCS, BSIT, College of Engineering" required />
     </div>
 
     <div class="row">
-      <label for="message">Your message</label>
+      <label for="message">Message</label>
       <textarea id="message" maxlength="500" placeholder="Share your thoughts, your name won't be shown." required></textarea>
       <div class="meta">
         <span>Nothing is stored except your words.</span>
@@ -114,18 +114,19 @@ import Icon from './Icon.astro';
     counter.textContent = `${message.value.length} / 500`;
   });
 
-  function buildFinalText(): string {
-    const aud = audience.value.trim() || 'Everyone';
-    const msg = message.value.trim();
-    const from = sender.value.trim() || 'Anonymous';
-    return `From/To [${aud}]:\n\n${msg}\n\n[From (Desired name or moniker)]: ${from}`;
-  }
-
   form?.addEventListener('submit', (e) => {
     e.preventDefault();
-    (window as any).__finalText = buildFinalText();
-    const preview = document.getElementById('preview');
-    if (preview) preview.textContent = (window as any).__finalText;
+
+    const to = audience.value.trim() || 'Everyone';
+    const msg = message.value.trim();
+    const from = sender.value.trim() || 'Anonymous';
+
+    const finalText = `To: ${to}\nMessage: ${msg}\nFrom: ${from}`;
+
+    (window as any).__finalText = finalText;
+    (window as any).__previewData = { to, message: msg, from };
+
+    window.dispatchEvent(new CustomEvent('preview-ready'));
     document.getElementById('overlay')?.classList.add('open');
   });
 </script>
