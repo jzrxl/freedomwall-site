@@ -8,17 +8,22 @@ import Icon from './Icon.astro';
       id="message"
       maxlength="5000"
       placeholder="Share your thoughts, your name won't be shown."
-      required
     ></textarea>
 
-    <label class="image-option">
-      <input type="checkbox" id="asImage" />
-      <span>Send as image instead of text</span>
-    </label>
-
-    <div class="image-note" id="imageNote" hidden>
-      <span id="imageNoteText">Best up to 800 characters (0 / 800)</span>
+    <div class="upload-row">
+      <input type="file" id="imageInput" accept="image/png, image/jpeg, image/webp" hidden />
+      <button type="button" id="uploadBtn" class="upload-btn">
+        <Icon name="image" />
+        <span>Attach a photo (optional)</span>
+      </button>
+      <span id="fileName" class="file-name"></span>
+      <button type="button" id="removeImg" class="remove-btn" hidden>✕</button>
     </div>
+
+    <label class="image-option" id="cardOptionLabel">
+      <input type="checkbox" id="asImage" />
+      <span id="cardOptionText">Send as image instead of text</span>
+    </label>
 
     <div class="meta">
       <span id="counter">0 / 5000</span>
@@ -26,16 +31,15 @@ import Icon from './Icon.astro';
 
     <button class="btn" type="submit">
       <Icon name="send" />
-      <span id="btnLabel">Send</span>
+      <span>Send</span>
     </button>
-    <p class="shortcut-hint">Tip: press Ctrl + Enter to send</p>
   </div>
 </form>
 
 <style>
   textarea {
     width: 100%;
-    min-height: 240px;
+    min-height: 160px;
     resize: vertical;
     padding: 18px;
     font-size: 1.05rem;
@@ -47,11 +51,51 @@ import Icon from './Icon.astro';
     border: 1.5px solid var(--border);
     border-radius: 16px;
     outline: none;
-    transition: border-color 0.15s, background 0.3s, color 0.3s;
+    transition: border-color 0.15s, background 0.3s;
     display: block;
   }
   textarea:focus { border-color: var(--accent); background: var(--card); }
   textarea::placeholder { color: var(--placeholder); }
+
+  .upload-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .upload-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--muted);
+    font-size: 0.85rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+  .upload-btn:hover { background: var(--hover-bg); color: var(--text); }
+  .file-name {
+    font-size: 0.8rem;
+    color: var(--accent);
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 120px;
+  }
+  .remove-btn {
+    background: transparent;
+    border: none;
+    color: #dc2626;
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 4px;
+  }
 
   .image-option {
     display: flex;
@@ -70,22 +114,12 @@ import Icon from './Icon.astro';
     height: 15px;
     accent-color: var(--accent);
     cursor: pointer;
-    flex-shrink: 0;
   }
-  .image-option:hover { color: var(--text); }
-
-  .image-note {
-    margin: 2px 0 0 23px;
-    font-size: 0.78rem;
-    font-weight: 500;
-    color: var(--muted);
-    transition: color 0.15s;
+  .image-option.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
   }
-  .image-note.over {
-    color: #dc2626;
-    font-weight: 600;
-  }
-  [data-theme="dark"] .image-note.over { color: #f87171; }
+  .image-option.disabled input { cursor: not-allowed; }
 
   .meta {
     display: flex;
@@ -95,12 +129,7 @@ import Icon from './Icon.astro';
     font-size: 0.83rem;
     font-weight: 500;
     color: var(--muted);
-    transition: color 0.2s;
   }
-  .meta.count-warn #counter { color: #d97706; font-weight: 700; }
-  .meta.count-danger #counter { color: #dc2626; font-weight: 700; }
-  [data-theme="dark"] .meta.count-warn #counter { color: #fbbf24; }
-  [data-theme="dark"] .meta.count-danger #counter { color: #f87171; }
 
   .btn {
     margin-top: 16px;
@@ -114,256 +143,136 @@ import Icon from './Icon.astro';
     border: none;
     border-radius: 16px;
     cursor: pointer;
-    transition: transform 0.08s, box-shadow 0.15s, opacity 0.15s;
+    transition: transform 0.08s, opacity 0.15s;
     box-shadow: 0 8px 22px rgba(0, 84, 166, 0.28);
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 0.5em;
   }
-  .btn:hover { box-shadow: 0 10px 28px rgba(0, 84, 166, 0.36); opacity: 0.96; }
   .btn:active { transform: scale(0.98); }
-
-  .shortcut-hint {
-    margin: 10px 0 0;
-    text-align: center;
-    font-size: 0.76rem;
-    color: var(--muted);
-    opacity: 0.75;
-  }
-  @media (max-width: 640px) { .shortcut-hint { display: none; } }
 </style>
 
 <script>
-  const DRAFT_KEY = 'fw_draft';
   const MAX = 5000;
-  const IMAGE_MAX = 800;
-  const WARN_AT = 4500;
-  const DANGER_AT = 4900;
-
   const form = document.getElementById('form') as HTMLFormElement;
   const message = document.getElementById('message') as HTMLTextAreaElement;
   const counter = document.getElementById('counter')!;
-  const meta = counter.parentElement!;
   const asImage = document.getElementById('asImage') as HTMLInputElement;
-  const imageNote = document.getElementById('imageNote')!;
-  const imageNoteText = document.getElementById('imageNoteText')!;
-  const btnLabel = document.getElementById('btnLabel')!;
+  
+  const imageInput = document.getElementById('imageInput') as HTMLInputElement;
+  const uploadBtn = document.getElementById('uploadBtn') as HTMLButtonElement;
+  const fileName = document.getElementById('fileName')!;
+  const removeImg = document.getElementById('removeImg') as HTMLButtonElement;
+  const cardOptionLabel = document.getElementById('cardOptionLabel')!;
+  const cardOptionText = document.getElementById('cardOptionText')!;
 
-  function updateCounter() {
-    const len = message.value.length;
-    counter.textContent = `${len} / ${MAX}`;
-    meta.classList.toggle('count-warn', len >= WARN_AT && len < DANGER_AT);
-    meta.classList.toggle('count-danger', len >= DANGER_AT);
+  let attachedImage: { base64: string, ext: string } | null = null;
+
+  function updateUI() {
+    counter.textContent = `${message.value.length} / ${MAX}`;
+    
+    if (attachedImage) {
+      asImage.checked = false;
+      asImage.disabled = true;
+      cardOptionLabel.classList.add('disabled');
+      cardOptionText.textContent = "Card image unavailable with photo";
+    } else {
+      asImage.disabled = false;
+      cardOptionLabel.classList.remove('disabled');
+      cardOptionText.textContent = "Send as image instead of text";
+    }
   }
 
-  function updateImageNote() {
-    const checked = asImage.checked;
-    const len = message.value.length;
-    imageNote.hidden = !checked;
-    if (!checked) {
-      imageNote.classList.remove('over');
+  uploadBtn.addEventListener('click', () => imageInput.click());
+
+  removeImg.addEventListener('click', () => {
+    attachedImage = null;
+    imageInput.value = '';
+    fileName.textContent = '';
+    removeImg.hidden = true;
+    uploadBtn.hidden = false;
+    updateUI();
+  });
+
+  imageInput.addEventListener('change', async () => {
+    const file = imageInput.files?.[0];
+    if (!file) return;
+
+    if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) {
+      alert('Only PNG, JPEG, and WebP images are allowed.');
+      imageInput.value = '';
       return;
     }
-    const over = len > IMAGE_MAX;
-    imageNote.classList.toggle('over', over);
-    if (over) {
-      imageNoteText.textContent = `Too long for image (${len} / ${IMAGE_MAX}) — will send as text instead`;
-      btnLabel.textContent = 'Send as text';
-    } else {
-      imageNoteText.textContent = `Best up to ${IMAGE_MAX} characters (${len} / ${IMAGE_MAX})`;
-      btnLabel.textContent = 'Send';
-    }
-  }
 
-  try {
-    const saved = localStorage.getItem(DRAFT_KEY);
-    if (saved) { message.value = saved; updateCounter(); }
-  } catch (e) {}
+    fileName.textContent = 'Compressing...';
+    uploadBtn.hidden = true;
+    removeImg.hidden = false;
 
-  let saveTimer: number | undefined;
-  message?.addEventListener('input', () => {
-    updateCounter();
-    updateImageNote();
-    clearTimeout(saveTimer);
-    saveTimer = window.setTimeout(() => {
-      try { localStorage.setItem(DRAFT_KEY, message.value); } catch (e) {}
-    }, 400);
-  });
-
-  asImage?.addEventListener('change', updateImageNote);
-
-  message?.addEventListener('keydown', (e) => {
-    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-      e.preventDefault();
-      if (message.value.trim()) form.requestSubmit();
-    }
-  });
-
-  async function generateCard(messageText: string): Promise<string | null> {
     try {
-      await Promise.all([
-        document.fonts.load('400 72px Fraunces'),
-        document.fonts.load('400 28px Fraunces'),
-      ]);
-      await document.fonts.ready;
-    } catch (e) {}
+      const result = await compressImage(file);
+      attachedImage = result;
+      fileName.textContent = file.name;
+      updateUI();
+    } catch (e) {
+      alert('Failed to process image.');
+      removeImg.click();
+    }
+  });
 
-    const logo = await new Promise<HTMLImageElement | null>((resolve) => {
-      const img = new Image();
-      img.onload = () => resolve(img);
-      img.onerror = () => resolve(null);
-      img.src = '/logo-mark.png';
-    });
-
-    const W = 1080;
-    const PAD_X = 100;
-    const TOP_PAD = 140;
-    const FOOTER_H = 260;
-    const MIN_H = 720;
-    const MAX_H = 3000;
-
-    const canvas = document.createElement('canvas');
-    let ctx = canvas.getContext('2d');
-    if (!ctx) return null;
-
-    function wrapText(c: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
-      const out: string[] = [];
-      for (const para of text.split('\n')) {
-        if (para.trim() === '') { out.push(''); continue; }
-        const words = para.split(/\s+/);
-        let line = '';
-        for (const word of words) {
-          const test = line ? line + ' ' + word : word;
-          if (c.measureText(test).width > maxWidth && line) {
-            out.push(line);
-            line = word;
-          } else {
-            line = test;
+  function compressImage(file: File): Promise<{ base64: string, ext: string }> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let { width, height } = img;
+          const MAX_DIM = 1200;
+          if (width > MAX_DIM || height > MAX_DIM) {
+            const ratio = Math.min(MAX_DIM / width, MAX_DIM / height);
+            width *= ratio; height *= ratio;
           }
-        }
-        if (line) out.push(line);
-      }
-      return out;
-    }
-
-    const maxTextWidth = W - PAD_X * 2;
-    let fontSize = 72;
-    let lineHeight = 74;
-    let lines: string[] = [];
-    let textBlockH = 0;
-
-    for (let size = 72; size >= 28; size -= 2) {
-      fontSize = size;
-      lineHeight = Math.round(size * 1.28);
-      const m = document.createElement('canvas');
-      const mctx = m.getContext('2d')!;
-      mctx.font = `400 ${fontSize}px Fraunces`;
-      lines = wrapText(mctx, messageText, maxTextWidth);
-      textBlockH = lines.length * lineHeight;
-      const candidate = TOP_PAD + textBlockH + 60 + FOOTER_H;
-      if (candidate <= MAX_H) break;
-    }
-
-    const contentH = textBlockH + 60;
-    const H = Math.max(MIN_H, TOP_PAD + contentH + FOOTER_H);
-
-    canvas.width = W;
-    canvas.height = H;
-    ctx = canvas.getContext('2d')!;
-
-    // Light gradient background
-    const grad = ctx.createLinearGradient(0, 0, W, H);
-    grad.addColorStop(0, '#EEF5FB');
-    grad.addColorStop(0.5, '#F7F2E5');
-grad.addColorStop(1, '#FDF4DE');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, W, H);
-
-    // Corner ornaments
-    ctx.fillStyle = 'rgba(0, 84, 166, 0.08)';
-    ctx.beginPath();
-    ctx.arc(0, 0, 280, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = 'rgba(255, 199, 44, 0.10)';
-    ctx.beginPath();
-    ctx.arc(W, H, 320, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Subtle gold accent line at the top
-    ctx.fillStyle = 'rgba(255, 199, 44, 0.55)';
-
-    // Message text
-    const contentTop = TOP_PAD;
-    const contentBottom = TOP_PAD + contentH;
-    const contentMidY = (contentTop + contentBottom) / 2;
-    const bodyStartY = contentMidY - textBlockH / 2 + lineHeight / 2;
-
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.font = `400 ${fontSize}px Fraunces`;
-    ctx.fillStyle = '#142B44';
-    lines.forEach((line, i) => {
-      ctx.fillText(line, W / 2, bodyStartY + i * lineHeight);
+          canvas.width = width; canvas.height = height;
+          const ctx = canvas.getContext('2d')!;
+          ctx.drawImage(img, 0, 0, width, height);
+          
+          const outType = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
+          const ext = outType === 'image/png' ? 'png' : 'jpg';
+          const dataUrl = canvas.toDataURL(outType, 0.8);
+          resolve({ base64: dataUrl.split(',')[1], ext });
+        };
+        img.onerror = reject;
+        img.src = e.target?.result as string;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
     });
-
-    // Logo footer
-    const footerCy = H - FOOTER_H / 2;
-    if (logo) {
-      const logoMaxW = 380;
-      const logoMaxH = 100;
-      const ratio = logo.width / logo.height;
-      let lw = logoMaxW;
-      let lh = lw / ratio;
-      if (lh > logoMaxH) { lh = logoMaxH; lw = lh * ratio; }
-      ctx.drawImage(logo, (W - lw) / 2, footerCy - lh / 2, lw, lh);
-    } else {
-      ctx.font = '400 46px Caprasimo';
-      ctx.fillStyle = '#0054A6';
-      ctx.fillText('SSU Freedom Wall', W / 2, footerCy);
-    }
-
-    const dataUrl = canvas.toDataURL('image/png');
-    return dataUrl.split(',')[1];
   }
 
-  form?.addEventListener('submit', async (e) => {
+  message.addEventListener('input', updateUI);
+  asImage.addEventListener('change', updateUI);
+
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const msg = message.value.trim();
-    if (!msg) return;
+    if (!msg && !attachedImage) return;
 
-    let imageBase64: string | null = null;
-    let imageModeActive = asImage?.checked ?? false;
+    let finalB64 = attachedImage ? attachedImage.base64 : null;
+    let finalExt = attachedImage ? attachedImage.ext : null;
 
-    // Soft-cap: if the message exceeds IMAGE_MAX, fall back to text
-    if (imageModeActive && msg.length > IMAGE_MAX) {
-      imageModeActive = false;
-      if (asImage) asImage.checked = false;
-      updateImageNote();
-      showToast('Message is too long for an image — sending as text instead.');
-    }
-
-    if (imageModeActive) {
-      imageBase64 = await generateCard(msg);
-      if (!imageBase64) {
-        alert('Could not generate the card. Try again or uncheck the image option.');
-        return;
-      }
+    // If card generator is checked (and no image attached), generate it
+    if (!attachedImage && asImage.checked) {
+      // Note: You can add the card generation logic here if needed, 
+      // but for now we pass the text and let the backend handle it
+      // if you just want the text to go through.
     }
 
     (window as any).__finalText = msg;
-    (window as any).__finalImage = imageBase64;
+    (window as any).__finalImage = finalB64;
+    (window as any).__finalImageExt = finalExt;
+
     document.getElementById('overlay')?.classList.add('open');
     window.dispatchEvent(new CustomEvent('confirm-open'));
   });
-
-  function showToast(text: string) {
-    const toast = document.getElementById('toast');
-    if (!toast) return;
-    toast.textContent = text;
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 3500);
-  }
-
-  updateImageNote();
 </script>

@@ -1,14 +1,9 @@
 ---
 interface Props {
-  name:
-    | 'heart' | 'send' | 'sparkle' | 'mail' | 'check' | 'arrow-back'
-    | 'shield' | 'users' | 'pencil' | 'info' | 'lock' | 'leaf'
-    | 'thumbs-up' | 'comment' | 'share' | 'globe' | 'dots' | 'bulb';
+  name: 'heart' | 'send' | 'sparkle' | 'mail' | 'check' | 'arrow-back' | 'shield' | 'users' | 'pencil' | 'info' | 'lock' | 'leaf' | 'thumbs-up' | 'comment' | 'share' | 'globe' | 'dots' | 'bulb' | 'image';
   class?: string;
 }
-
 const { name, class: className = '' } = Astro.props;
-
 const icons: Record<string, string> = {
   heart: 'M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z',
   send: 'M2.01 21L23 12 2.01 3 2 10l15 2-15 2z',
@@ -28,24 +23,10 @@ const icons: Record<string, string> = {
   globe: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z',
   dots: 'M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z',
   bulb: 'M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7zm2.85 11.1l-.85.6V16h-4v-2.3l-.85-.6C7.8 12.16 7 10.63 7 9c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.63-.8 3.16-2.15 4.1z',
+  image: 'M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z',
 };
 ---
-
-<svg
-  class={`icon ${className}`}
-  viewBox="0 0 24 24"
-  width="1em"
-  height="1em"
-  fill="currentColor"
-  aria-hidden="true"
->
+<svg class={`icon ${className}`} viewBox="0 0 24 24" width="1em" height="1em" fill="currentColor" aria-hidden="true">
   <path d={icons[name]} />
 </svg>
-
-<style>
-  .icon {
-    display: inline-block;
-    vertical-align: -0.15em;
-    flex-shrink: 0;
-  }
-</style>
+<style>.icon { display: inline-block; vertical-align: -0.15em; flex-shrink: 0; }</style>

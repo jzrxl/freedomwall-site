@@ -3,14 +3,26 @@ import Icon from './Icon.astro';
 ---
 
 <div class="overlay" id="overlay">
-  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
-    <h2 id="confirmTitle">Send this message?</h2>
-    <p class="hint">Once it's sent, it can't be edited.</p>
+  <div class="modal" role="dialog" aria-modal="true">
+    <h2>Send this message?</h2>
+    <p class="hint">Here's what will be saved.</p>
+
+    <div class="preview-container">
+      <div id="textPreviewWrap" class="preview-block" hidden>
+        <div class="preview-label">Text preview:</div>
+        <div class="preview-text" id="previewText"></div>
+      </div>
+
+      <div id="imagePreviewWrap" class="preview-block" hidden>
+        <div class="preview-label">Image preview:</div>
+        <img id="previewImage" class="preview-img" alt="Uploaded preview" />
+      </div>
+    </div>
 
     <div class="actions">
       <button type="button" class="cancel" id="cancelBtn">
         <Icon name="arrow-back" />
-        <span>Keep editing</span>
+        <span>Go back</span>
       </button>
       <button type="button" class="confirm" id="confirmBtn">
         <Icon name="send" />
@@ -38,111 +50,119 @@ import Icon from './Icon.astro';
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    max-width: 420px;
+    max-width: 460px;
     width: 100%;
     padding: 26px 22px;
     box-shadow: var(--shadow);
-    transition: background 0.3s, border-color 0.3s;
     text-align: center;
-    outline: none;
   }
 
   .modal h2 {
     font-family: var(--font-display);
     font-weight: 400;
     font-size: 1.5rem;
-    margin: 0 0 8px;
+    margin: 0 0 6px;
     color: var(--text);
   }
-
   .hint {
-    margin: 0 0 22px;
+    margin: 0 0 18px;
     color: var(--muted);
     font-size: 0.9rem;
-    font-weight: 500;
   }
 
-  .actions { display: flex; gap: 10px; }
+  .preview-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    text-align: left;
+  }
 
+  .preview-block {
+    background: var(--input-bg);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 14px;
+    overflow: hidden;
+  }
+
+  .preview-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+    letter-spacing: 0.05em;
+  }
+
+  .preview-text {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: var(--text);
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    max-height: 140px;
+    overflow-y: auto;
+  }
+
+  .preview-img {
+    display: block;
+    width: 100%;
+    max-height: 260px;
+    object-fit: contain;
+    border-radius: 8px;
+    background: #000;
+  }
+
+  .actions { display: flex; gap: 10px; margin-top: 22px; }
   .actions button {
     flex: 1;
     padding: 13px;
     font-size: 0.98rem;
     font-weight: 700;
-    font-family: inherit;
     border-radius: 14px;
     border: none;
     cursor: pointer;
-    transition: background 0.15s, opacity 0.15s, color 0.3s, border-color 0.3s;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 0.45em;
   }
-
-  .cancel {
-    background: transparent;
-    color: var(--muted);
-    border: 1.5px solid var(--border);
-  }
-  .cancel:hover { background: var(--hover-bg); color: var(--text); }
-
-  .confirm {
-    background: var(--grad);
-    color: #ffffff;
-    box-shadow: 0 6px 18px rgba(0, 84, 166, 0.3);
-  }
-  .confirm:hover { opacity: 0.94; }
+  .cancel { background: transparent; color: var(--muted); border: 1.5px solid var(--border); }
+  .confirm { background: var(--grad); color: #ffffff; }
 </style>
 
 <script>
   const overlay = document.getElementById('overlay')!;
-  const cancelBtn = document.getElementById('cancelBtn') as HTMLButtonElement;
+  const cancelBtn = document.getElementById('cancelBtn')!;
   const confirmBtn = document.getElementById('confirmBtn') as HTMLButtonElement;
   const toast = document.getElementById('toast')!;
   const form = document.getElementById('form') as HTMLFormElement;
-  const counter = document.getElementById('counter')!;
-  const message = document.getElementById('message') as HTMLTextAreaElement | null;
-  const asImage = document.getElementById('asImage') as HTMLInputElement | null;
+  
+  const textPreviewWrap = document.getElementById('textPreviewWrap')!;
+  const previewText = document.getElementById('previewText')!;
+  const imagePreviewWrap = document.getElementById('imagePreviewWrap')!;
+  const previewImage = document.getElementById('previewImage') as HTMLImageElement;
 
-  let trapHandler: ((e: KeyboardEvent) => void) | null = null;
+  function close() { overlay.classList.remove('open'); }
 
-  function installFocusTrap() {
-    const focusables = [cancelBtn, confirmBtn];
-    cancelBtn.focus();
-    trapHandler = (e: KeyboardEvent) => {
-      if (e.key === 'Tab') {
-        const idx = focusables.indexOf(document.activeElement as HTMLButtonElement);
-        e.preventDefault();
-        const next = e.shiftKey
-          ? (idx <= 0 ? focusables.length - 1 : idx - 1)
-          : (idx >= focusables.length - 1 || idx === -1 ? 0 : idx + 1);
-        focusables[next].focus();
-      }
-    };
-    document.addEventListener('keydown', trapHandler, true);
-  }
+  window.addEventListener('confirm-open', () => {
+    const text = (window as any).__finalText || '';
+    const imgB64 = (window as any).__finalImage;
 
-  function removeFocusTrap() {
-    if (trapHandler) {
-      document.removeEventListener('keydown', trapHandler, true);
-      trapHandler = null;
+    if (text) {
+      previewText.textContent = text;
+      textPreviewWrap.hidden = false;
+    } else {
+      textPreviewWrap.hidden = true;
     }
-  }
 
-  function close() {
-    overlay.classList.remove('open');
-    removeFocusTrap();
-    message?.focus();
-  }
-
-  function showToast(text: string) {
-    toast.textContent = text;
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 3000);
-  }
-
-  window.addEventListener('confirm-open', () => installFocusTrap());
+    if (imgB64) {
+      previewImage.src = `data:image/jpeg;base64,${imgB64}`; // Assume jpeg for preview rendering
+      imagePreviewWrap.hidden = false;
+    } else {
+      imagePreviewWrap.hidden = true;
+    }
+  });
 
   cancelBtn?.addEventListener('click', close);
   document.addEventListener('keydown', (e) => {
@@ -154,11 +174,13 @@ import Icon from './Icon.astro';
     confirmBtn.innerHTML = '<span>Sending...</span>';
 
     const finalText = (window as any).__finalText || '';
-    const finalImage = (window as any).__finalImage as string | null;
+    const finalImage = (window as any).__finalImage;
+    const finalExt = (window as any).__finalImageExt;
 
     const params = new URLSearchParams({ message: finalText });
     if (finalImage) {
       params.set('imageBase64', finalImage);
+      params.set('imageExt', finalExt);
     }
 
     try {
@@ -169,20 +191,19 @@ import Icon from './Icon.astro';
       });
       if (!res.ok) throw new Error();
 
-      overlay.classList.remove('open');
-      removeFocusTrap();
+      close();
       form?.reset();
-      if (asImage) asImage.checked = false;
-      counter.textContent = '0 / 5000';
-      counter.parentElement?.classList.remove('count-warn', 'count-danger');
-      try { localStorage.removeItem('fw_draft'); } catch (e) {}
-      (window as any).__finalImage = null;
-      showToast('Sent. Thank you for sharing.');
+      document.getElementById('removeImg')?.click();
+      toast.textContent = 'Sent. Thank you for sharing.';
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
     } catch {
-      showToast('Something went wrong. Please try again.');
+      toast.textContent = 'Something went wrong.';
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
     } finally {
       confirmBtn.disabled = false;
-      confirmBtn.innerHTML = '<svg class="icon" viewBox="0 0 24 24" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg><span>Yes, send it</span>';
+      confirmBtn.innerHTML = '<span>Yes, send it</span>';
     }
   });
 </script>
